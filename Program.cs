@@ -1,7 +1,11 @@
+using CardTradeBuddy.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddHttpClient<ICardDataProvider, TcgDexCardDataProvider>(client =>
+    client.BaseAddress = new Uri(TcgDexCardDataProvider.BaseUrl));
 
 var app = builder.Build();
 

@@ -1,0 +1,17 @@
+@page
+@model ProtoUploadModel
+@{
+    ViewData["Title"] = "Proto Upload";
+}
+
+<h1>Proto Upload</h1>
+
+<form method="post" enctype="multipart/form-data">
+    <input type="file" asp-for="Upload" />
+    <button type="submit">Upload</button>
+</form>
+
+@if (Model.Message is not null)
+{
+    <p>@Model.Message</p>
+}

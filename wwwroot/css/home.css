@@ -1,0 +1,380 @@
+﻿/* Front page. Mobile first: the base rules are the phone layout, wider screens only add on top. */
+
+:root {
+    --navy: #1f2a44;
+    --muted: #6b7280;
+    --blue: #2563eb;
+    --blue-dark: #1d4ed8;
+    --green: #22c55e;
+    --cream: #fff3cc;
+    --sand: #ffd98a;
+    --field: #fff8e1;
+    --field-border: #e8d9a8;
+}
+
+body.home {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: var(--navy);
+    background: linear-gradient(180deg, var(--cream) 0%, var(--sand) 100%) fixed;
+    -webkit-text-size-adjust: 100%;
+}
+
+.home-page {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+/* ---- Hero ---- */
+
+.hero {
+    text-align: center;
+    padding: 8px 16px 0;
+}
+
+/* ---- Language switch, upper left ---- */
+
+.lang-switch {
+    display: flex;
+    justify-content: flex-start;
+    gap: 2px;
+    margin: 0 0 0 -8px;
+}
+
+.lang {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.lang svg {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1.5px rgba(31, 42, 68, 0.25);
+    opacity: 0.9;
+}
+
+.lang.is-active svg {
+    opacity: 1;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4.5px var(--blue);
+}
+
+.lang:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.45);
+    outline-offset: -2px;
+}
+
+.hero-title {
+    margin: 0;
+    font-size: clamp(28px, 9vw, 40px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+}
+
+.hero-tagline {
+    margin: 6px 0 0;
+    font-size: 16px;
+    color: #4b5563;
+}
+
+.hero-art {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 4px auto 0;
+}
+
+/* ---- Login sheet: rises from the bottom over the kids' shoulders ---- */
+
+.login-sheet {
+    position: relative;
+    flex: 1;
+    margin-top: -14px;
+    padding: 12px 20px calc(16px + env(safe-area-inset-bottom));
+    background: #fff;
+    border-radius: 30px 30px 0 0;
+    box-shadow: 0 -6px 24px rgba(31, 42, 68, 0.08);
+}
+
+.sheet-handle {
+    display: block;
+    width: 40px;
+    height: 5px;
+    margin: 0 auto 10px;
+    border-radius: 3px;
+    background: #e5ddc2;
+}
+
+.login-sheet h2 {
+    margin: 0 0 8px;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.field {
+    margin-bottom: 8px;
+}
+
+.field label {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* 16px text keeps iOS Safari from zooming in when a field gets focus. */
+.field input {
+    width: 100%;
+    height: 40px;
+    padding: 0 11px;
+    border: 1.5px solid var(--field-border);
+    border-radius: 9px;
+    background: var(--field);
+    font: inherit;
+    font-size: 16px;
+    color: var(--navy);
+    box-sizing: border-box;
+}
+
+.field input::placeholder {
+    color: var(--muted);
+}
+
+.field input:focus-visible,
+.btn:focus-visible,
+.forgot:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.45);
+    outline-offset: 2px;
+}
+
+.password-wrap {
+    position: relative;
+}
+
+.password-wrap input {
+    padding-right: 38px;
+}
+
+.eye {
+    position: absolute;
+    top: 50%;
+    right: 11px;
+    width: 20px;
+    height: 20px;
+    transform: translateY(-50%);
+    color: var(--muted);
+    pointer-events: none;
+}
+
+.options {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 16px;
+    margin: 0 0 12px;
+    font-size: 12px;
+}
+
+.remember {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 34px;
+    cursor: pointer;
+}
+
+.remember input {
+    width: 17px;
+    height: 17px;
+    margin: 0;
+    accent-color: var(--green);
+}
+
+.forgot {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    color: var(--blue);
+    font-weight: 500;
+}
+
+/* ---- Buttons ---- */
+
+.btn {
+    display: block;
+    width: 100%;
+    min-height: 40px;
+    border-radius: 10px;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.btn + .btn {
+    margin-top: 8px;
+}
+
+.btn-primary {
+    border: 2px solid var(--blue);
+    background: var(--blue);
+    color: #fff;
+}
+
+.btn-primary:active {
+    background: var(--blue-dark);
+    border-color: var(--blue-dark);
+}
+
+.btn-secondary {
+    border: 2px solid var(--blue);
+    background: #fff;
+    color: var(--blue);
+}
+
+.btn-secondary:active {
+    background: #eff4ff;
+}
+
+/* ---- Larger screens: same column, the sheet becomes a floating card ---- */
+
+@media (min-width: 560px) {
+    .home-page {
+        justify-content: center;
+    }
+
+    .hero {
+        padding-top: 40px;
+    }
+
+    .login-sheet {
+        flex: 0 0 auto;
+        margin-bottom: 40px;
+        padding-bottom: 28px;
+        border-radius: 30px;
+    }
+
+    .sheet-handle {
+        display: none;
+    }
+}
+
+/* ---- Desktop: illustration on the left, login card on the right, all within one screen ---- */
+
+@media (min-width: 900px) {
+    .home-page {
+        max-width: 860px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 330px;
+        gap: 40px;
+        align-items: center;
+        padding: 24px 32px;
+        box-sizing: border-box;
+    }
+
+    /* Pinned to the real upper-left corner of the page rather than the column. */
+    .lang-switch {
+        position: fixed;
+        top: 10px;
+        left: 14px;
+        margin: 0;
+    }
+
+    .hero {
+        padding: 0;
+    }
+
+    .hero-title {
+        font-size: 34px;
+    }
+
+    .hero-tagline {
+        margin-top: 4px;
+        font-size: 15px;
+    }
+
+    /* Nothing covers the kids' shoulders here, so fade them out instead of a hard edge. */
+    .hero-art {
+        max-width: 380px;
+        -webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent 100%);
+        mask-image: linear-gradient(to bottom, #000 82%, transparent 100%);
+    }
+
+    /* Compact controls: a mouse pointer does not need phone-sized touch targets. */
+    .login-sheet {
+        margin: 0;
+        padding: 24px 22px;
+        border-radius: 24px;
+        box-shadow: 0 14px 40px rgba(31, 42, 68, 0.16);
+    }
+
+    .login-sheet h2 {
+        margin-bottom: 10px;
+        font-size: 19px;
+    }
+
+    .field {
+        margin-bottom: 10px;
+    }
+
+    .field label {
+        margin-bottom: 4px;
+        font-size: 12px;
+    }
+
+    .field input {
+        height: 42px;
+        border-radius: 10px;
+        font-size: 14px;
+    }
+
+    .eye {
+        width: 20px;
+        height: 20px;
+    }
+
+    .options {
+        margin: 2px 0 14px;
+        font-size: 12px;
+    }
+
+    .remember {
+        gap: 8px;
+        min-height: 32px;
+    }
+
+    .remember input {
+        width: 18px;
+        height: 18px;
+    }
+
+    .forgot {
+        min-height: 32px;
+    }
+
+    .btn {
+        min-height: 44px;
+        border-radius: 12px;
+        font-size: 15px;
+    }
+
+    .btn + .btn {
+        margin-top: 10px;
+    }
+}

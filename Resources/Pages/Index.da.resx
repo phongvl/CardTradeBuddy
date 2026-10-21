@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- Dansk -->
+  <data name="Title" xml:space="preserve"><value>Log ind</value></data>
+  <data name="Tagline" xml:space="preserve"><value>Fair bytter for kortfans</value></data>
+  <data name="HeroArtLabel" xml:space="preserve"><value>To børn der jubler med samlekort og et grønt skjold for fair bytte</value></data>
+  <data name="LanguageNavLabel" xml:space="preserve"><value>Sprog</value></data>
+  <data name="Welcome" xml:space="preserve"><value>Velkommen tilbage</value></data>
+  <data name="Email" xml:space="preserve"><value>E-mail</value></data>
+  <data name="EmailPlaceholder" xml:space="preserve"><value>navn@eksempel.dk</value></data>
+  <data name="Password" xml:space="preserve"><value>Adgangskode</value></data>
+  <data name="PasswordPlaceholder" xml:space="preserve"><value>Din adgangskode</value></data>
+  <data name="RememberMe" xml:space="preserve"><value>Husk mig</value></data>
+  <data name="ForgotPassword" xml:space="preserve"><value>Jeg har glemt min adgangskode</value></data>
+  <data name="LogIn" xml:space="preserve"><value>Log ind</value></data>
+  <data name="CreateUser" xml:space="preserve"><value>Opret bruger</value></data>
+</root>

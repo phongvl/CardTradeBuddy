@@ -1,5 +1,6 @@
 @page
 @model ProtoUploadModel
+@using CardTradeBuddy.Services
 @{
     ViewData["Title"] = "Proto Upload";
 }
@@ -8,10 +9,119 @@
 
 <form method="post" enctype="multipart/form-data">
     <input type="file" asp-for="Upload" />
+    <br />
+    <label asp-for="SelectedModel">Model</label>
+    <select asp-for="SelectedModel" asp-items="Model.ModelItems"></select>
+    <br />
     <button type="submit">Upload</button>
 </form>
 
 @if (Model.Message is not null)
 {
     <p>@Model.Message</p>
+}
+
+@if (Model.ModelUsed is not null)
+{
+    <p>
+        Model: <strong>@Model.ModelUsed</strong> (@Model.ElapsedSeconds s)
+        @if (Model.DetectedFinish is not null)
+        {
+            <text>| detected finish: <strong>@Model.DetectedFinish</strong></text>
+        }
+        @if (Model.CardDetected is { } outline)
+        {
+            <text>| card outline: <strong>@(outline ? "found" : "not found, whole photo used")</strong></text>
+        }
+    </p>
+}
+
+@if (Model.PreparedImageDataUri is not null)
+{
+    <details>
+        <summary>Image sent to the model</summary>
+        <img src="@Model.PreparedImageDataUri" alt="Image sent to the model" style="max-width: 640px;" />
+    </details>
+}
+
+@if (Model.Card is { } card)
+{
+    <h2>@card.Name</h2>
+    @if (card.ImageUrl is not null)
+    {
+        <img src="@card.ImageUrl" alt="@card.Name" style="max-width: 300px;" />
+    }
+    <ul>
+        <li>Set: @card.SetName (@card.SetId)</li>
+        <li>Number: @card.LocalId@(card.SetOfficialCardCount is { } total ? $"/{total}" : "")</li>
+        @if (card.MatchNote is not null)
+        {
+            <li>Set check: @card.MatchNote</li>
+        }
+        @if (Model.AveragePrice is { } avg)
+        {
+            <li>
+                <strong>Calculated average price</strong>
+                (@(avg.Finish.ToString())@(avg.FinishAssumed ? ", finish assumed" : "")):
+                @(avg.AverageEur is { } avgEur ? $"€{avgEur:0.00}" : "n/a")
+            </li>
+        }
+        <li>Rarity: @(card.Rarity ?? "-")</li>
+        <li>Illustrator: @(card.Illustrator ?? "-")</li>
+        @if (card.Pricing?.Cardmarket is { } cm)
+        {
+            <li>Cardmarket (@cm.Currency): average @cm.Average, low @cm.Low, trend @cm.Trend, 7-day avg @cm.Avg7Days, 30-day avg @cm.Avg30Days; holo: average @cm.HoloAverage, low @cm.HoloLow, trend @cm.HoloTrend</li>
+        }
+        @if (card.Pricing?.TcgPlayer is { } tp)
+        {
+            @foreach (var (label, p) in new[] { ("normal", tp.Normal), ("holofoil", tp.Holofoil), ("reverse holofoil", tp.ReverseHolofoil) })
+            {
+                @if (p is not null)
+                {
+                    <li>TCGplayer @label (@tp.Currency): market @p.Market, low @p.Low, mid @p.Mid, high @p.High</li>
+                }
+            }
+        }
+        @if (card.Pricing is null)
+        {
+            <li>No price data available.</li>
+        }
+    </ul>
+}
+
+@if (Model.AveragePrices.Count > 0)
+{
+    <h3>Calculated average price per finish</h3>
+    <table>
+        <thead>
+            <tr><th>Finish</th><th>Cardmarket (EUR)</th><th>TCGplayer (USD)</th><th>TCGplayer (EUR)</th><th>Average (EUR)</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var row in Model.AveragePrices)
+            {
+                <tr>
+                    <td>@row.Finish</td>
+                    <td>@(row.CardmarketEur is { } a ? $"€{a:0.00}" : "-")</td>
+                    <td>@(row.TcgPlayerUsd is { } b ? $"${b:0.00}" : "-")</td>
+                    <td>@(row.TcgPlayerEur is { } c ? $"€{c:0.00}" : "-")</td>
+                    <td><strong>@(row.AverageEur is { } d ? $"€{d:0.00}" : row.PricesDisagree ? "marketplaces disagree" : "-")</strong></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <p>
+        @if (Model.UsdToEur is { } rate)
+        {
+            <text>TCGplayer converted at 1 USD = @rate.ToString("0.#####") EUR (European Central Bank rate via Frankfurter).</text>
+        }
+        else
+        {
+            <text>Exchange rate unavailable: TCGplayer is not converted, so the average uses Cardmarket only.</text>
+        }
+    </p>
+}
+
+@if (Model.ResultJson is not null)
+{
+    <pre>@Model.ResultJson</pre>
 }

@@ -23,6 +23,9 @@ public record CardData
     public int? Retreat { get; init; }
 
     public CardPricing? Pricing { get; init; }
+
+    /// <summary>How the set was confirmed against the printed set code and total, or a warning if they disagree with this card.</summary>
+    public string? MatchNote { get; init; }
 }
 
 /// <summary>Prices in the currency of each marketplace (Cardmarket: EUR, TCGplayer: USD).</summary>
@@ -45,6 +48,9 @@ public record CardmarketPricing
     public decimal? HoloAverage { get; init; }
     public decimal? HoloLow { get; init; }
     public decimal? HoloTrend { get; init; }
+    public decimal? Avg1DayHolo { get; init; }
+    public decimal? Avg7DaysHolo { get; init; }
+    public decimal? Avg30DaysHolo { get; init; }
 }
 
 public record TcgPlayerPricing

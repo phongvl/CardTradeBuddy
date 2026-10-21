@@ -4,6 +4,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddHttpClient<ILlmService, OllamaLlmService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Ollama:BaseUrl"] ?? OllamaLlmService.DefaultBaseUrl);
+    client.Timeout = TimeSpan.FromMinutes(5); // local vision models can be slow, especially on first load
+});
+builder.Services.AddMemoryCache();
+builder.Services.AddHttpClient<IExchangeRateService, FrankfurterExchangeRateService>(client =>
+    client.BaseAddress = new Uri(FrankfurterExchangeRateService.BaseUrl));
 builder.Services.AddHttpClient<ICardDataProvider, TcgDexCardDataProvider>(client =>
     client.BaseAddress = new Uri(TcgDexCardDataProvider.BaseUrl));
 

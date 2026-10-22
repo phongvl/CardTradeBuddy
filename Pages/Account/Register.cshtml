@@ -4,6 +4,7 @@
 @{
     Layout = "_LayoutHome";
     ViewData["Title"] = T["RegisterTitle"].Value;
+    ViewData["HeroArt"] = "register";
 }
 
 <main class="home-page">
@@ -32,9 +33,16 @@
                     <input id="email" name="Email" type="email" inputmode="email" autocomplete="email" placeholder="@T["EmailPlaceholder"]" value="@Model.Email" />
                 </div>
 
+                <div class="field">
+                    <label for="birthday">@T["Birthday"]</label>
+                    <input id="birthday" name="Birthday" type="date" autocomplete="bday" min="@Model.OldestBirthday" max="@Model.Today" value="@Model.Birthday" aria-describedby="birthday-hint" />
+                    <p class="hint" id="birthday-hint">@T["BirthdayHint", Model.MinimumAge]</p>
+                </div>
+
                 <partial name="_PasswordField" model="@(new PasswordFieldModel("password", "Password", T["Password"].Value, "new-password", Hint: T["PasswordHint", PasswordRules.MinLength].Value))" />
                 <partial name="_PasswordField" model="@(new PasswordFieldModel("confirm", "ConfirmPassword", T["ConfirmPassword"].Value, "new-password"))" />
 
+                <partial name="_FormGuard" />
                 <button type="submit" class="btn btn-primary">@T["CreateUser"]</button>
                 <a class="btn btn-secondary" asp-page="/Account/Login">@T["BackToLogin"]</a>
             </form>

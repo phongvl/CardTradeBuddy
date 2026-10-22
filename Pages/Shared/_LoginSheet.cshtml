@@ -28,6 +28,7 @@
             <a class="forgot" asp-page="/Account/ForgotPassword">@T["ForgotPassword"]</a>
         </div>
 
+        <partial name="_FormGuard" />
         <button type="submit" class="btn btn-primary">@T["LogIn"]</button>
         <a class="btn btn-secondary" asp-page="/Account/Register">@T["CreateUser"]</a>
     </form>

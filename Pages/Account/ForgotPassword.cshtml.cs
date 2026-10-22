@@ -9,7 +9,7 @@ namespace CardTradeBuddy.Pages.Account;
 
 /// <summary>"I forgot my password": the LoginServer keeps the reset tokens and sends the email; this page only asks it to.</summary>
 [EnableRateLimiting("auth")]
-public class ForgotPasswordModel(LoginServerClient loginServer, IStringLocalizer<SharedResource> localizer) : PageModel
+public class ForgotPasswordModel(LoginServerClient loginServer, FormGuard guard, IStringLocalizer<SharedResource> localizer) : PageModel
 {
     [BindProperty] public string Email { get; set; } = "";
 
@@ -23,7 +23,7 @@ public class ForgotPasswordModel(LoginServerClient loginServer, IStringLocalizer
 
     public async Task<IActionResult> OnPostAsync()
     {
-        Error = await RequestResetAsync();
+        Error = guard.IsValid(Request) ? await RequestResetAsync() : localizer["FormExpired"].Value;
         Sent = Error is null;
         return Page();
     }

@@ -33,6 +33,9 @@ builder.Services.AddHttpClient<LoginServerClient>((sp, client) =>
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 builder.Services.AddScoped<UserPreferences>();
+builder.Services.AddScoped<UserProfiles>();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton<FormGuard>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {

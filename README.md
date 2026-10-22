@@ -65,6 +65,7 @@ dotnet run
 | `Login:ClientSecret` | (none) | The app's secret in the LoginServer. **Never in the repo:** `appsettings.Development.local.json` (git-ignored) in development, `appsettings.Production.json` on the server. |
 | `Login:VerifyEmail` | `false` | `true`: new users must click a link in an email before they can log in. Needs the app's email sender set up in the LoginServer. |
 | `ConnectionStrings:Default` | (none) | The PostgreSQL database for per-user preferences (see [Database](#database-preferences)). **Never in the repo**, like the login secret. Without it the site works, but preferences are not saved. |
+| `Account:MinimumAge` | `13` | The youngest age that may create a user (checked against the birthday given at sign-up). |
 | `Network:BehindCloudflare` | `false` | `true`: trust Cloudflare's `CF-Connecting-IP` header as the visitor's address (for the rate limit). Only set it if the site really is behind Cloudflare. |
 | `RateLimit:AuthPerMinute` | `10` | Requests per minute from one address to the login and account pages. |
 
@@ -109,12 +110,20 @@ ResetPassword, VerifyEmail, Logout); the front page shows the same login box.
 
 ### Protections
 
-- **Anti-forgery tokens** on every form post, and logging out is a POST, so another site cannot log anyone out.
+- **Anti-forgery tokens** on every form post (language switch, login, create user, forgot and reset password, confirm email,
+  log out, card upload), and logging out is a POST, so another site cannot log anyone out. Razor Pages validates the token on
+  every POST by default; a post without it gets HTTP 400.
+- **Form guard** (`Services/FormGuard.cs`, partial `Pages/Shared/_FormGuard.cshtml`) on the public forms (login, create user,
+  forgot and reset password): a hidden trap field that people never see and bots fill in, plus a signed time stamp. A post that
+  comes in less than 2 seconds after the form was shown, more than 8 hours after, or with the trap filled, is refused with
+  "The form was not sent. Reload the page and try again." This only stops simple bots; the rate limit and the LoginServer's lockout do the rest.
 - **Rate limit:** 10 requests a minute per address to the login and account pages (`RateLimit:AuthPerMinute`); more get
   HTTP 429. The LoginServer also locks an account for 15 minutes after 5 wrong passwords.
 - **No account enumeration:** creating a user with an existing email, and asking for a password reset for an unknown
   email, give the same answer as the normal case.
 - **Open redirects:** the return address after login and after a language switch is only accepted if it is a path on this site.
+- **Age limit:** creating a user needs a birthday, and the user must be at least `Account:MinimumAge` years old (13 by default).
+  The birthday is checked on the server (the date field's limits are only a convenience) and never shown to anyone.
 - **Passwords** must be at least 10 characters (the LoginServer's rule). They are never echoed back to the page or logged.
 - **Email links** (confirm email) only show a button; the address is confirmed when the button is pressed, because mail
   programs and virus scanners open links automatically and must not be able to use them up.
@@ -140,7 +149,10 @@ ResetPassword, VerifyEmail, Logout); the front page shows the same login box.
    Users -> the user -> App access -> tick CardTradeBuddy.
 6. **Email confirmation (optional):** once the email sender works, deploy with `-LoginVerifyEmail true`. With it off, a new
    user can log in straight away. With it on, a new user must first click the link in the email, and creating users fails
-   if the app has no email sender in the LoginServer.
+   if the app has no email sender in the LoginServer. **Give the flag once:** it is saved in `appsettings.Production.json`
+   and kept on every later deployment, so a plain `.\Scripts\deploy.ps1` does not reset it. Switch it off again with
+   `-LoginVerifyEmail false`. (A user who never gets the mail can be confirmed by hand in the LoginServer: Users -> the user ->
+   Email confirmed.)
 
 ### Development and trouble-shooting
 
@@ -156,7 +168,8 @@ ResetPassword, VerifyEmail, Logout); the front page shows the same login box.
   place your editor does not read, which is one reason for preferring the local file.
 - **Emails in development** are not sent: the LoginServer writes them to its log (look for `DEV EMAIL`). The links in them
   point at `https://localhost:7139`, so run this app on that address (the `https` launch profile) to follow them.
-  To try email confirmation locally: `dotnet user-secrets set "Login:VerifyEmail" "true"`.
+  To try email confirmation locally: set `"VerifyEmail": true` under `Login` in `appsettings.Development.local.json`
+  (or `dotnet user-secrets set "Login:VerifyEmail" "true"`).
 - Against the deployed LoginServer on `secure.phong.dk` the app has to be registered first (see "Set it up" above); the
   links in emails then point at `https://cardtradebuddy.com`.
 - The app logs a warning at startup if `Login:ClientSecret` is missing, and in Development it logs the LoginServer address it will use.
@@ -212,7 +225,7 @@ It is safe to run again and again. What it does, in order:
 | `-PoolCredential` | (built-in identity) | Run the pool as a specific account: `-PoolCredential (Get-Credential)` |
 | `-LoginClientSecret` | (keep the stored one) | The LoginServer client secret. Give it once; it is saved in `appsettings.Production.json` and kept on later deployments. |
 | `-DatabaseConnectionString` | (keep the stored one) | The PostgreSQL connection string for preferences, or put it on one line in `Scripts\prod.connection.local`. Saved in `appsettings.Production.json`. See [Database](#database-preferences). |
-| `-LoginVerifyEmail` | (keep) | `true` or `false`: sets `Login:VerifyEmail`. |
+| `-LoginVerifyEmail` | (keep the stored one) | `true` or `false`: sets `Login:VerifyEmail`. Give it once; it is saved in `appsettings.Production.json` and kept on later deployments. |
 | `-BehindCloudflare` | off | Sets `Network:BehindCloudflare` to true. |
 | `-SkipIisSetup` | off | Only publish and copy, do not touch IIS |
 
@@ -447,6 +460,14 @@ database only knows a user by the LoginServer user id (the `NameIdentifier` clai
 | `Language` | `varchar(10)`, null | The language the user last picked (`en`, `da`), or null. |
 | `UpdatedAt` | `timestamptz` | When the row last changed. |
 
+| Table `user_profiles` | Type | Meaning |
+| --- | --- | --- |
+| `UserId` (primary key) | `varchar(64)` | The LoginServer user id. |
+| `BirthDate` | `date` | The birthday given when the user was created. Saved only for a brand-new account (never for an "already exists" answer). |
+| `CreatedAt` | `timestamptz` | When the row was saved. |
+
+Users created before the birthday was asked for have no `user_profiles` row.
+
 A new setting is a new column: add a property to `Data/UserPreference.cs`, then `dotnet ef migrations add <Name> -o Data/Migrations`
 (the tool is in `.config/dotnet-tools.json`; run `dotnet tool restore` once; add `--configuration Release` if the debugger has the
 Debug build locked).
@@ -480,18 +501,21 @@ padding keeps the buttons clear of the iPhone home bar.
 ```
 Pages/
   Index.cshtml(.cs)          Front page: the login box
-  Account/                   Login, Register, ForgotPassword, ResetPassword, VerifyEmail, Logout
+  Account/                   Login, Register (with birthday), ForgotPassword, ResetPassword, VerifyEmail, Logout
   SetLanguage.cshtml(.cs)    Where the language flags post to
   ProtoUpload.cshtml(.cs)    Card recognition test page (login required)
   Shared/_Layout.cshtml      HTML shell (language attribute, optional Head section)
   Shared/_LayoutHome.cshtml  The cheerful look used by the front page and the account pages
-  Shared/_Hero.cshtml        Flags, title, tagline and the kids illustration
+  Shared/_Hero.cshtml        Flags, title, tagline and the illustration (_HeroArtLogin, or _HeroArtRegister when a page sets ViewData["HeroArt"] = "register")
+  Shared/_FormGuard.cshtml   The hidden trap field and time stamp inside the public forms
   Shared/_LoginSheet.cshtml  The login box
   Shared/_PasswordField.cshtml  A password field with the show/hide eye button
 Services/
   LoginServerClient.cs       Login, create user, confirm email, password reset (calls the LoginServer)
   ClientIp.cs, EmailAddress.cs, PasswordRules.cs, RememberedEmailCookie.cs   Small helpers for the login
   UserPreferences.cs         Reads and saves a logged-in user's preferences (the preferred language)
+  UserProfiles.cs, BirthDate.cs   Saves and checks the birthday given at sign-up
+  FormGuard.cs               Trap field and time stamp check for the public forms
   CardImagePreprocessor.cs   Find the card, straighten it, build the compact image (OpenCvSharp)
   OllamaLlmService.cs        Vision model calls and model list (ILlmService)
   TcgDexCardDataProvider.cs  Card lookup, set cross-check, stale-price retry (ICardDataProvider)

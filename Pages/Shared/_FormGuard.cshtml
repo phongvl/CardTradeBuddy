@@ -1,0 +1,6 @@
+@inject CardTradeBuddy.Services.FormGuard Guard
+@* Part of every public form: the hidden trap field and the signed time stamp checked by FormGuard. *@
+<div class="form-trap" aria-hidden="true">
+    <label>Leave this empty<input type="text" name="@CardTradeBuddy.Services.FormGuard.TrapField" tabindex="-1" autocomplete="off" value="" /></label>
+</div>
+<input type="hidden" name="@CardTradeBuddy.Services.FormGuard.StampField" value="@Guard.NewStamp()" />

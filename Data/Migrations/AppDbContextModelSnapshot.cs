@@ -39,6 +39,23 @@ namespace CardTradeBuddy.Data.Migrations
 
                     b.ToTable("user_preferences", (string)null);
                 });
+
+            modelBuilder.Entity("CardTradeBuddy.Data.UserProfile", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateOnly>("BirthDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("user_profiles", (string)null);
+                });
 #pragma warning restore 612, 618
         }
     }

@@ -62,5 +62,12 @@
   <data name="VerifyDone" xml:space="preserve"><value>Din e-mailadresse er bekræftet. Du kan nu logge ind.</value></data>
   <data name="ShowPassword" xml:space="preserve"><value>Vis adgangskode</value></data>
   <data name="HidePassword" xml:space="preserve"><value>Skjul adgangskode</value></data>
+  <data name="HeroArtRegisterLabel" xml:space="preserve"><value>Et barn der holder et velkomstkort op, med en booster-pakke, en gave og konfetti</value></data>
+  <data name="Birthday" xml:space="preserve"><value>Fødselsdag</value></data>
+  <data name="BirthdayHint" xml:space="preserve"><value>Vi spørger for at vide, at du er gammel nok (mindst {0}). Vi viser den aldrig til andre.</value></data>
+  <data name="BirthdayRequired" xml:space="preserve"><value>Skriv din fødselsdag.</value></data>
+  <data name="BirthdayInvalid" xml:space="preserve"><value>Fødselsdagen ser ikke rigtig ud. Vælg en rigtig dato.</value></data>
+  <data name="BirthdayTooYoung" xml:space="preserve"><value>Du skal være mindst {0} år for at oprette en bruger.</value></data>
+  <data name="FormExpired" xml:space="preserve"><value>Formularen blev ikke sendt. Genindlæs siden og prøv igen.</value></data>
 </root>
 

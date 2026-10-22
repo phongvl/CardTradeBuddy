@@ -464,3 +464,12 @@ body.home {
         margin-top: 12px;
     }
 }
+/* ---- Form guard: the hidden trap field (see Services/FormGuard.cs) is invisible to people, bots still fill it in ---- */
+
+.form-trap {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}

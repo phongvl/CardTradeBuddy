@@ -62,5 +62,12 @@
   <data name="VerifyDone" xml:space="preserve"><value>Your email address is confirmed. You can log in now.</value></data>
   <data name="ShowPassword" xml:space="preserve"><value>Show password</value></data>
   <data name="HidePassword" xml:space="preserve"><value>Hide password</value></data>
+  <data name="HeroArtRegisterLabel" xml:space="preserve"><value>A kid holding up a welcome card, with a booster pack, a gift and confetti</value></data>
+  <data name="Birthday" xml:space="preserve"><value>Birthday</value></data>
+  <data name="BirthdayHint" xml:space="preserve"><value>We ask so we know you are old enough (at least {0}). We never show it to anyone.</value></data>
+  <data name="BirthdayRequired" xml:space="preserve"><value>Enter your birthday.</value></data>
+  <data name="BirthdayInvalid" xml:space="preserve"><value>That birthday does not look right. Pick a real date.</value></data>
+  <data name="BirthdayTooYoung" xml:space="preserve"><value>You must be at least {0} years old to create a user.</value></data>
+  <data name="FormExpired" xml:space="preserve"><value>The form was not sent. Reload the page and try again.</value></data>
 </root>
 

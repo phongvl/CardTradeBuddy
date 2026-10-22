@@ -480,3 +480,6 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Local development settings and secrets (LoginServer client secret): never commit
+appsettings.Development.local.json

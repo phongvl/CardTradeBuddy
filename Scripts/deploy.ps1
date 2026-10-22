@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Sets up IIS for CardTradeBuddy (app pool, site, bindings, permissions) and deploys the app.
 
@@ -22,6 +22,11 @@
     given. If none is found, https is skipped with a warning and http still works. Get a real certificate (for
     example with win-acme / Let's Encrypt) and run the script again with its thumbprint.
 
+    Login settings: the app logs in against the LoginServer with a client secret that must never be in the repo. Pass it once
+    with -LoginClientSecret; it is written to appsettings.Production.json in the site folder (readable only by administrators and
+    the app pool) and kept on later deployments, because the file is left alone when the files are mirrored. The same file also
+    takes -LoginVerifyEmail and -BehindCloudflare. Other settings in that file are never touched.
+
     By default the pool runs as the built-in ApplicationPoolIdentity (IIS AppPool\CardTradeBuddy), which needs
     no password. To run it as a specific account instead, pass -PoolCredential (Get-Credential); the password
     is only kept in memory for this run and is stored by IIS, never written to this script.
@@ -33,6 +38,7 @@
     .\Scripts\deploy.ps1 -CertThumbprint 0123ABCD...   # use this certificate for https
     .\Scripts\deploy.ps1 -CreateSelfSignedCert         # testing only: browsers will warn
     .\Scripts\deploy.ps1 -SkipHttps                    # http bindings only
+    .\Scripts\deploy.ps1 -LoginClientSecret '...'      # first time: store the LoginServer client secret
 #>
 [CmdletBinding()]
 param(
@@ -47,6 +53,9 @@ param(
     [switch]$CreateSelfSignedCert,
     [switch]$SkipHttps,
     [pscredential]$PoolCredential,
+    [string]$LoginClientSecret,
+    [ValidateSet('true', 'false')][string]$LoginVerifyEmail,
+    [switch]$BehindCloudflare,
     [switch]$SkipIisSetup
 )
 
@@ -196,6 +205,56 @@ function Initialize-Iis {
     }
 }
 
+function ConvertTo-Hashtable($value) {
+    if ($value -is [System.Management.Automation.PSCustomObject]) {
+        $table = [ordered]@{}
+        foreach ($property in $value.PSObject.Properties) { $table[$property.Name] = ConvertTo-Hashtable $property.Value }
+        return $table
+    }
+    if ($value -is [System.Collections.IEnumerable] -and $value -isnot [string]) {
+        return @($value | ForEach-Object { ConvertTo-Hashtable $_ })
+    }
+    return $value
+}
+
+# Writes the settings that must stay on the server (the LoginServer client secret) into appsettings.Production.json.
+# The file is not part of the published files and is skipped by the mirror, so it survives every deployment. Values that are not
+# given are left as they are.
+function Set-ProductionSettings {
+    $file = Join-Path $Target 'appsettings.Production.json'
+    $settings = [ordered]@{}
+    if (Test-Path $file) {
+        $settings = ConvertTo-Hashtable (Get-Content $file -Raw | ConvertFrom-Json)
+    }
+
+    function Set-Value($section, $key, $value) {
+        if (-not $settings.Contains($section)) { $settings[$section] = [ordered]@{} }
+        $settings[$section][$key] = $value
+    }
+
+    $changed = $false
+    if ($LoginClientSecret)  { Set-Value 'Login' 'ClientSecret' $LoginClientSecret; $changed = $true }
+    if ($LoginVerifyEmail)   { Set-Value 'Login' 'VerifyEmail' ($LoginVerifyEmail -eq 'true'); $changed = $true }
+    if ($BehindCloudflare)   { Set-Value 'Network' 'BehindCloudflare' $true; $changed = $true }
+
+    if ($changed) {
+        # No byte order mark: some tools choke on it.
+        [IO.File]::WriteAllText($file, ($settings | ConvertTo-Json -Depth 10), (New-Object Text.UTF8Encoding($false)))
+
+        # The file holds a secret: administrators and the system, plus read access for the account that runs the app.
+        $grants = @('BUILTIN\Administrators:F', 'NT AUTHORITY\SYSTEM:F')
+        if (-not $SkipIisSetup) { $grants += "${poolAccount}:R" }
+        icacls $file /inheritance:r /grant:r $grants /Q | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw "icacls failed for $file (exit code $LASTEXITCODE)." }
+        Write-Host "Saved settings to $file" -ForegroundColor Cyan
+    }
+
+    $hasSecret = $settings.Contains('Login') -and $settings['Login'].Contains('ClientSecret') -and $settings['Login']['ClientSecret']
+    if (-not $hasSecret) {
+        Write-Warning 'No LoginServer client secret is stored yet, so nobody can log in. Run again with -LoginClientSecret <secret> (see the README, section Login).'
+    }
+}
+
 $publishDir = Join-Path ([IO.Path]::GetTempPath()) "CardTradeBuddy-publish-$([guid]::NewGuid().ToString('N'))"
 $offlineFile = Join-Path $Target 'app_offline.htm'
 
@@ -217,9 +276,12 @@ try {
 
     Write-Host "Copying files to $Target ..." -ForegroundColor Cyan
     # /MIR removes files in the target that are no longer in the build. Kept: the log folder, the offline page, and
-    # .well-known (Let's Encrypt validation files written by win-acme, which must survive a deploy).
-    robocopy $publishDir $Target /MIR /XD logs .well-known /XF app_offline.htm /NFL /NDL /NJH /NJS /NP
+    # .well-known (Let's Encrypt validation files written by win-acme, which must survive a deploy), and appsettings.Production.json
+    # (the settings and secrets that live only on the server). *.local.json (development secrets) is never copied to the server.
+    robocopy $publishDir $Target /MIR /XD logs .well-known /XF app_offline.htm appsettings.Production.json *.local.json /NFL /NDL /NJH /NJS /NP
     if ($LASTEXITCODE -ge 8) { throw "robocopy failed with exit code $LASTEXITCODE." }
+
+    Set-ProductionSettings
 
     Write-Host 'Deployed.' -ForegroundColor Green
 }

@@ -1,0 +1,16 @@
+@* The look of the front page and the account pages: the cheerful full-screen background. Pages that use it: Layout = "_LayoutHome". *@
+@{
+    Layout = "_Layout";
+    ViewData["BodyClass"] = "home";
+}
+
+@section Head {
+    <meta name="theme-color" content="#FFF3CC" />
+    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+}
+
+@RenderBody()
+
+@section Scripts {
+    <script src="~/js/password-toggle.js" asp-append-version="true" defer></script>
+}

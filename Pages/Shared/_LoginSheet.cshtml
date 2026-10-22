@@ -1,0 +1,34 @@
+@model CardTradeBuddy.Pages.Account.LoginForm
+
+<section class="login-sheet" aria-labelledby="login-heading">
+    <span class="sheet-handle" aria-hidden="true"></span>
+    <h2 id="login-heading">@T["Welcome"]</h2>
+
+    @if (Model.Notice is not null)
+    {
+        <p class="message notice" role="status">@Model.Notice</p>
+    }
+    @if (Model.Error is not null)
+    {
+        <p class="message error" role="alert">@Model.Error</p>
+    }
+
+    <form method="post" asp-page="/Account/Login" novalidate>
+        <input type="hidden" name="ReturnUrl" value="@Model.ReturnUrl" />
+
+        <div class="field">
+            <label for="email">@T["Email"]</label>
+            <input id="email" name="Email" type="email" inputmode="email" autocomplete="email" placeholder="@T["EmailPlaceholder"]" value="@Model.Email" />
+        </div>
+
+        <partial name="_PasswordField" model="@(new CardTradeBuddy.Pages.PasswordFieldModel("password", "Password", T["Password"].Value, "current-password", T["PasswordPlaceholder"].Value))" />
+
+        <div class="options">
+            <label class="remember"><input type="checkbox" name="RememberMe" value="true" @(Model.RememberMe ? "checked" : null) /> <span>@T["RememberMe"]</span></label>
+            <a class="forgot" asp-page="/Account/ForgotPassword">@T["ForgotPassword"]</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary">@T["LogIn"]</button>
+        <a class="btn btn-secondary" asp-page="/Account/Register">@T["CreateUser"]</a>
+    </form>
+</section>

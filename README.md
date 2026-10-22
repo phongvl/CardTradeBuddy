@@ -1,6 +1,6 @@
 # CardTradeBuddy
 
-A mobile-first web app for Pokémon card trading. A user photographs a card, a local vision model
+A mobile-first web app for PokÃƒÂ©mon card trading. A user photographs a card, a local vision model
 reads it, the card is looked up in [TCGdex](https://tcgdex.dev), and the prices from Cardmarket and TCGplayer are
 turned into one estimated value in EUR. A separate function judges whether a trade between two sets of
 cards is fair.
@@ -13,30 +13,33 @@ ASP.NET Core Razor Pages on .NET 10. Hosted on Windows with IIS.
 2. [Prerequisites](#prerequisites)
 3. [Run locally](#run-locally)
 4. [Configuration](#configuration)
-5. [Deploy to IIS](#deploy-to-iis)
-6. [How a card photo is recognised](#how-a-card-photo-is-recognised)
-7. [How images are scaled](#how-images-are-scaled)
-8. [Card lookup (TCGdex)](#card-lookup-tcgdex)
-9. [How prices are calculated](#how-prices-are-calculated)
-10. [How a trade is evaluated](#how-a-trade-is-evaluated)
-11. [Languages](#languages)
-12. [Front page design](#front-page-design)
-13. [Project layout](#project-layout)
-14. [Known limits](#known-limits)
+5. [Login (LoginServer)](#login-loginserver)
+6. [Deploy to IIS](#deploy-to-iis)
+7. [How a card photo is recognised](#how-a-card-photo-is-recognised)
+8. [How images are scaled](#how-images-are-scaled)
+9. [Card lookup (TCGdex)](#card-lookup-tcgdex)
+10. [How prices are calculated](#how-prices-are-calculated)
+11. [How a trade is evaluated](#how-a-trade-is-evaluated)
+12. [Languages](#languages)
+13. [Front page design](#front-page-design)
+14. [Project layout](#project-layout)
+15. [Known limits](#known-limits)
 
 ## Status
 
 | Part | State |
 | --- | --- |
-| Front page (`/`): title, illustration, login box, language flags | Design only. The fields can be typed in, but Log in, Create user and "I forgot my password" do nothing yet. The language flags do work. |
-| Test page (`/ProtoUpload`) | Working. Upload a card photo, pick an Ollama model, see what was read, the card and its prices. Uploads are never saved to disk. |
+| Front page (`/`) and account pages | Working: log in, create user, forgot password, reset password, confirm email and log out, all through the LoginServer (see [Login](#login-loginserver)), plus the language flags. |
+| Test page (`/ProtoUpload`) | Working, for logged-in users only. Upload a card photo, pick an Ollama model, see what was read, the card and its prices. Uploads are never saved to disk. |
 | `TradeEvaluator` | Working as a function. Not connected to any page yet. |
-| Users, login, trades storage | Not built. |
+| Storing trades or other per-user data | Not built. The app has no database of its own; users live in the LoginServer. |
 
 ## Prerequisites
 
 **To develop:** .NET 10 SDK, and [Ollama](https://ollama.com) running locally with at least one vision model
 (the default is `qwen3-vl:8b`; `ollama pull qwen3-vl:8b`).
+
+**For login:** the [LoginServer](../LoginServer) running, with this app registered in it (see [Login](#login-loginserver)).
 
 **On the server:** IIS with the [ASP.NET Core Hosting Bundle for .NET 10](https://dotnet.microsoft.com/download/dotnet/10.0),
 the Microsoft Visual C++ Redistributable (OpenCV's native library needs it), and Ollama reachable from the server.
@@ -48,7 +51,7 @@ dotnet run
 ```
 
 - `http://localhost:5030` and `https://localhost:7139` (see `Properties/launchSettings.json`).
-- `/` is the front page, `/ProtoUpload` is the card recognition test page.
+- `/` is the front page (the login box), `/ProtoUpload` is the card recognition test page. It needs a login, so first put the client secret in the git-ignored `appsettings.Development.local.json` next to the project (see [Login](#login-loginserver)).
 - In VS Code, press F5: `.vscode/launch.json` builds first and opens the browser.
 
 ## Configuration
@@ -56,9 +59,119 @@ dotnet run
 | Setting | Default | Meaning |
 | --- | --- | --- |
 | `Ollama:BaseUrl` | `http://localhost:11434/` | Where Ollama runs. Set in `appsettings.json` or the environment variable `Ollama__BaseUrl`. |
+| `Login:Authority` | `https://secure.phong.dk` | The LoginServer's address. |
+| `Login:ClientId` | `cardtradebuddy` | The client id this app is registered under in the LoginServer. |
+| `Login:ClientSecret` | (none) | The app's secret in the LoginServer. **Never in the repo:** `appsettings.Development.local.json` (git-ignored) in development, `appsettings.Production.json` on the server. |
+| `Login:VerifyEmail` | `false` | `true`: new users must click a link in an email before they can log in. Needs the app's email sender set up in the LoginServer. |
+| `Network:BehindCloudflare` | `false` | `true`: trust Cloudflare's `CF-Connecting-IP` header as the visitor's address (for the rate limit). Only set it if the site really is behind Cloudflare. |
+| `RateLimit:AuthPerMinute` | `10` | Requests per minute from one address to the login and account pages. |
+
+Settings that must not be in the repo live outside it. In development: the git-ignored `appsettings.Development.local.json` in the project folder, for example `{ "Login": { "Authority": "https://localhost:5001", "ClientSecret": "..." } }` (`dotnet user-secrets` works too). On the server: `appsettings.Production.json` in the site folder, which `deploy.ps1` writes and never overwrites.
 
 Other values are constants in code: the default model (`ProtoUpload.cshtml.cs`), the supported languages
 (`Localization/AppLanguages.cs`), and the tuning numbers described below.
+
+## Login (LoginServer)
+
+CardTradeBuddy has no user database. Users live in the **LoginServer** (`C:\VS Code\LoginServer`, deployed at
+`https://secure.phong.dk`), a single-sign-on server built on OpenIddict and PostgreSQL. CardTradeBuddy is registered
+there as an app with **its own login page**: the login box on this site sends the credentials from this app's
+**server** (never from the browser) to the LoginServer, which decides. The LoginServer's own README is the full
+reference for its API; `MyPaintingBook` uses the same API and was the model for this code.
+
+### What the app calls
+
+| Action | Calls to the LoginServer |
+| --- | --- |
+| Log in | `POST /connect/token` with `grant_type=password`, the client id and secret, the email and password. On success the reply holds a token with the user's id, email, app and admin flags, from which the app starts its own session. |
+| Create user | A service token (`grant_type=client_credentials`, scope `users.create`), then `POST /api/users` with email and password (plus `verifyEmail`, `culture` and `verifyPath` when email confirmation is on). The LoginServer decides what the new user is: never an admin, and with access to this app only. |
+| Confirm email | A service token (scope `users.verify`), then `POST /api/users/verify-email` with the token from the email link. |
+| Forgot password | A service token (scope `passwords.reset`), then `POST /api/password-reset/request`; the LoginServer sends the email. The link opens `/Account/ResetPassword?token=...`, which calls `POST /api/password-reset/confirm`. |
+
+Code: `Services/LoginServerClient.cs`. The pages are in `Pages/Account/` (Login, Register, ForgotPassword,
+ResetPassword, VerifyEmail, Logout); the front page shows the same login box.
+
+### Sessions
+
+- A successful login starts a session cookie `cardtradebuddy.session` (HttpOnly, SameSite Lax, Secure in production).
+  Without "Remember me" it is a session cookie that ends when the browser closes, or after 8 hours without use. With
+  "Remember me" it lasts **30 days** (renewed while the user keeps coming back), and the email is remembered in a second
+  cookie, `cardtradebuddy.email`, to prefill the login box. A remembered session is not re-checked with the LoginServer,
+  so a user who is switched off there can stay logged in here until the cookie ends.
+- Logging in here creates no session on the LoginServer, so there is no single sign-on to other apps.
+- **Show/hide password:** every password field has an eye button (`Pages/Shared/_PasswordField.cshtml`, `wwwroot/js/password-toggle.js`).
+  Pressing it shows what was typed and pressing again hides it; a visible password is hidden again when the form is sent.
+  Without JavaScript the button stays hidden, so there is never a button that does nothing.
+- `/ProtoUpload` requires a login (`AuthorizePage` in `Program.cs`). A visitor who is not logged in is sent to
+  `/Account/Login`, and after logging in returns to the page they asked for, or to `/ProtoUpload`.
+
+### Protections
+
+- **Anti-forgery tokens** on every form post, and logging out is a POST, so another site cannot log anyone out.
+- **Rate limit:** 10 requests a minute per address to the login and account pages (`RateLimit:AuthPerMinute`); more get
+  HTTP 429. The LoginServer also locks an account for 15 minutes after 5 wrong passwords.
+- **No account enumeration:** creating a user with an existing email, and asking for a password reset for an unknown
+  email, give the same answer as the normal case.
+- **Open redirects:** the return address after login and after a language switch is only accepted if it is a path on this site.
+- **Passwords** must be at least 10 characters (the LoginServer's rule). They are never echoed back to the page or logged.
+- **Email links** (confirm email) only show a button; the address is confirmed when the button is pressed, because mail
+  programs and virus scanners open links automatically and must not be able to use them up.
+- **The client secret** is never in the repo.
+
+### Set it up (once)
+
+1. **Register the app in the LoginServer:** `https://secure.phong.dk` -> Admin -> Apps -> Register app.
+   - Name `CardTradeBuddy`, Client ID `cardtradebuddy` (must match `Login:ClientId`).
+   - Redirect URI `https://cardtradebuddy.com/signin-oidc`. This app never uses it (there is no redirect login), but the
+     LoginServer needs one and builds the links in its emails (password reset, email confirmation) from the **origin of
+     the first redirect address**, so use the address people really use (`cardtradebuddy.com`, not `www`).
+   - Tick **Require a client secret** (leave the secret empty to have one generated), **Allow this app to have its own
+     login page** and **Allow this app to create users**.
+2. **Email (for forgot password, and for email confirmation if you use it):** verify `cardtradebuddy.com` in Resend
+   (DNS records in Cloudflare), then fill in **Email sender address** on the app's page in the LoginServer (for example
+   `support@cardtradebuddy.com`).
+3. **Copy the secret:** on the app's page in the LoginServer click **Show secret**.
+4. **Give the secret to this app.** On the server, once: `.\Scripts\deploy.ps1 -LoginClientSecret "<secret>"` (saved in
+   `appsettings.Production.json`, kept on later deployments). For development: put it in `appsettings.Development.local.json` in the project folder
+   (`{ "Login": { "Authority": "https://localhost:5001", "ClientSecret": "<secret>" } }`).
+5. **Access:** users created through the app get access to it automatically. An existing LoginServer user needs
+   Users -> the user -> App access -> tick CardTradeBuddy.
+6. **Email confirmation (optional):** once the email sender works, deploy with `-LoginVerifyEmail true`. With it off, a new
+   user can log in straight away. With it on, a new user must first click the link in the email, and creating users fails
+   if the app has no email sender in the LoginServer.
+
+### Development and trouble-shooting
+
+- **Local setup.** The development LoginServer (`C:\VS Code\LoginServer`, `https://localhost:5001`) registers this app at
+  startup from its user-secrets (`dotnet user-secrets list --project src/LoginServer`, the keys `Bootstrap:Apps:cardtradebuddy:*`:
+  client id, name, redirect URIs for `https://localhost:7139`, own login, user creation, the secret and the mail sender).
+  This app has `Login:Authority` (`https://localhost:5001`) and the same `Login:ClientSecret` in `appsettings.Development.local.json`.
+  (The secret is also shown in the LoginServer admin: Apps -> CardTradeBuddy -> Show secret.)
+  The LoginServer only registers an app when its client id does not exist yet, so later changes are made in its admin
+  pages. Restart this app after changing its settings; the LoginServer needs no restart once the app is registered.
+  If a login says the client id is invalid, check which server the app uses: in Development it logs `Login settings: Authority=...`
+  at startup and the error message names the server. A tool that is not running as you can write `dotnet user-secrets` to a
+  place your editor does not read, which is one reason for preferring the local file.
+- **Emails in development** are not sent: the LoginServer writes them to its log (look for `DEV EMAIL`). The links in them
+  point at `https://localhost:7139`, so run this app on that address (the `https` launch profile) to follow them.
+  To try email confirmation locally: `dotnet user-secrets set "Login:VerifyEmail" "true"`.
+- Against the deployed LoginServer on `secure.phong.dk` the app has to be registered first (see "Set it up" above); the
+  links in emails then point at `https://cardtradebuddy.com`.
+- The app logs a warning at startup if `Login:ClientSecret` is missing, and in Development it logs the LoginServer address it will use.
+  Every login attempt is logged with the email, the server that answered and the outcome (`InvalidCredentials`, `LockedOut`,
+  `NoAccess`, `NotVerified`, ...), never the password: look for `Login for ...` in the console. A wrong password, a lockout and a
+  user without access to the app can all be told apart there.
+- `appsettings.Development.local.json` overrides environment variables and user-secrets (it is added last). It is not copied to
+  `bin\` or into a publish, and `deploy.ps1` never copies `*.local.json` to the server.
+- The LoginServer's own login page and this app check passwords with the same function and the same rules, so the same
+  password gives the same result. If a login works there but not here, compare the databases: the development LoginServer
+  (`https://localhost:5001`, database `loginserver`) and the one on `secure.phong.dk` (`loginserver_prod`) keep separate users
+  and passwords.
+- In Development, when the login service is "not available", the message ends with `[dev detail: ...]` saying why, for
+  example a wrong client id or secret, or a setting that is not ticked for the app in the LoginServer. Visitors never see it.
+- Tested end to end against the development LoginServer: create user (also twice with the same email), log in, wrong
+  password, the account lockout, forgot and reset password (with the emailed link, used once only), and email
+  confirmation. Not yet run against the production LoginServer, where the app still has to be registered.
 
 ## Deploy to IIS
 
@@ -79,7 +192,7 @@ It is safe to run again and again. What it does, in order:
 4. Adds HTTPS bindings (port 443, SNI) for both names, if it can find a certificate (see below).
 5. Runs `dotnet publish -c Release` into a temporary folder.
 6. Puts `app_offline.htm` in the site so IIS stops the app and releases its files.
-7. Mirrors the published files into the site folder with `robocopy /MIR`. Kept untouched: `logs\` and `.well-known\`.
+7. Mirrors the published files into the site folder with `robocopy /MIR`. Kept untouched: `logs\`, `.well-known\` and `appsettings.Production.json` (the server-side settings, including the LoginServer secret). If `-LoginClientSecret` and friends are given, that file is written or updated now; it is readable only by administrators and the app pool.
 8. Removes `app_offline.htm` and the temporary folder, then makes sure the pool and site are started.
    The removal also happens if copying fails, so the site is never left showing the offline page by mistake.
 
@@ -95,6 +208,9 @@ It is safe to run again and again. What it does, in order:
 | `-CreateSelfSignedCert` | off | Create a self-signed certificate (testing only, browsers warn) |
 | `-SkipHttps` | off | HTTP bindings only |
 | `-PoolCredential` | (built-in identity) | Run the pool as a specific account: `-PoolCredential (Get-Credential)` |
+| `-LoginClientSecret` | (keep the stored one) | The LoginServer client secret. Give it once; it is saved in `appsettings.Production.json` and kept on later deployments. |
+| `-LoginVerifyEmail` | (keep) | `true` or `false`: sets `Login:VerifyEmail`. |
+| `-BehindCloudflare` | off | Sets `Network:BehindCloudflare` to true. |
 | `-SkipIisSetup` | off | Only publish and copy, do not touch IIS |
 
 ### HTTPS and Let's Encrypt
@@ -303,17 +419,17 @@ nothing about condition, language or demand, only prices.
 
 English and Danish, using standard ASP.NET Core localization.
 
-- Text lives in `Resources/Pages/Index.resx` (default, English) and `Resources/Pages/Index.da.resx` (Danish),
-  and the page reads it by key (`@Localizer["Welcome"]`).
+- Text lives in `Resources/SharedResource.resx` (default, English) and `Resources/SharedResource.da.resx` (Danish),
+  and pages read it by key (`@T["Welcome"]`; code uses `IStringLocalizer<SharedResource>`).
 - Which language is used, per request: `?culture=da` in the URL, else the `.AspNetCore.Culture` cookie, else the
   browser's `Accept-Language` header, else English.
-- The flags in the upper-left corner are buttons that post their language to the page. The handler stores the
-  choice in the cookie for one year and reloads the page. It works without JavaScript.
+- The flags in the upper-left corner are buttons that post their language to `/set-language`. It stores the choice in
+  the cookie for one year and returns to the page the visitor came from. It works without JavaScript.
 - The page's `lang` attribute follows the chosen language.
 - Numbers also follow the language, so on `/ProtoUpload` a Danish visitor sees `0,04` and an English one `0.04`.
 
-**To add a language:** add its code to `Localization/AppLanguages.cs`, add a `Index.<code>.resx` next to the
-existing ones, and add a flag button to the language switch in `Pages/Index.cshtml`.
+**To add a language:** add its code to `Localization/AppLanguages.cs`, add a `SharedResource.<code>.resx` next to the
+existing ones, and add a flag button to the language switch in `Pages/Shared/_Hero.cshtml`.
 
 ## Front page design
 
@@ -333,10 +449,18 @@ padding keeps the buttons clear of the iPhone home bar.
 
 ```
 Pages/
-  Index.cshtml(.cs)          Front page (design only, language switch works)
-  ProtoUpload.cshtml(.cs)    Card recognition test page
+  Index.cshtml(.cs)          Front page: the login box
+  Account/                   Login, Register, ForgotPassword, ResetPassword, VerifyEmail, Logout
+  SetLanguage.cshtml(.cs)    Where the language flags post to
+  ProtoUpload.cshtml(.cs)    Card recognition test page (login required)
   Shared/_Layout.cshtml      HTML shell (language attribute, optional Head section)
+  Shared/_LayoutHome.cshtml  The cheerful look used by the front page and the account pages
+  Shared/_Hero.cshtml        Flags, title, tagline and the kids illustration
+  Shared/_LoginSheet.cshtml  The login box
+  Shared/_PasswordField.cshtml  A password field with the show/hide eye button
 Services/
+  LoginServerClient.cs       Login, create user, confirm email, password reset (calls the LoginServer)
+  ClientIp.cs, EmailAddress.cs, PasswordRules.cs, RememberedEmailCookie.cs   Small helpers for the login
   CardImagePreprocessor.cs   Find the card, straighten it, build the compact image (OpenCvSharp)
   OllamaLlmService.cs        Vision model calls and model list (ILlmService)
   TcgDexCardDataProvider.cs  Card lookup, set cross-check, stale-price retry (ICardDataProvider)
@@ -345,14 +469,16 @@ Services/
   FrankfurterExchangeRateService.cs   USD -> EUR rate, cached (IExchangeRateService)
   TradeEvaluator.cs          Fair-trade check and TradeOptions
 Localization/AppLanguages.cs Supported languages
-Resources/Pages/             .resx text files per language
+Resources/                   SharedResource.resx (English) and SharedResource.da.resx (Danish)
 Scripts/deploy.ps1           IIS setup and deployment
 wwwroot/css/home.css         Front page styles
+wwwroot/js/password-toggle.js  The eye button on password fields
 ```
 
 ## Known limits
 
-- The front page does nothing yet: no users, login, password reset or storage of trades.
+- There is no storage of trades or other per-user data yet, and no admin or profile pages. There is no bot check (such as
+  Cloudflare Turnstile) on the login and create user forms, only the rate limit and the LoginServer's account lockout.
 - Card detection can fail on a cluttered background or when the card is the same colour as the table; then the
   whole photo is used. Cards photographed upside down rely on the model noticing (one extra call).
 - The layout assumption is a modern card: set code and number at the bottom, name at the top. Older layouts

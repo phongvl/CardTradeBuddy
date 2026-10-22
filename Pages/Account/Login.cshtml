@@ -1,0 +1,11 @@
+@page
+@model CardTradeBuddy.Pages.Account.LoginModel
+@{
+    Layout = "_LayoutHome";
+    ViewData["Title"] = T["LoginTitle"].Value;
+}
+
+<main class="home-page">
+    <partial name="_Hero" />
+    <partial name="_LoginSheet" model="Model.Form" />
+</main>

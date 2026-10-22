@@ -1,4 +1,4 @@
-﻿/* Front page. Mobile first: the base rules are the phone layout, wider screens only add on top. */
+/* Front page. Mobile first: the base rules are the phone layout, wider screens only add on top. */
 
 :root {
     --navy: #1f2a44;
@@ -166,18 +166,57 @@ body.home {
 }
 
 .password-wrap input {
-    padding-right: 38px;
+    padding-right: 46px;
 }
 
-.eye {
+/* The eye button sits inside the right end of the field and is a full-height touch target. */
+.eye-toggle {
     position: absolute;
-    top: 50%;
-    right: 11px;
-    width: 20px;
-    height: 20px;
-    transform: translateY(-50%);
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 0 9px 9px 0;
+    background: transparent;
     color: var(--muted);
-    pointer-events: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.eye-toggle[hidden] {
+    display: none;
+}
+
+.eye-toggle svg {
+    width: 22px;
+    height: 22px;
+}
+
+.eye-toggle:hover {
+    color: var(--navy);
+}
+
+.eye-toggle:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.45);
+    outline-offset: -3px;
+}
+
+/* Pressed = the password is visible: blue, and a slash through the eye. */
+.eye-toggle[aria-pressed="true"] {
+    color: var(--blue);
+}
+
+.eye-slash {
+    display: none;
+}
+
+.eye-toggle[aria-pressed="true"] .eye-slash {
+    display: block;
 }
 
 .options {
@@ -213,10 +252,49 @@ body.home {
     font-weight: 500;
 }
 
+/* ---- Messages and small texts (login errors, notices, account pages) ---- */
+
+.message {
+    margin: 0 0 10px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.message.error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+}
+
+.message.notice {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+}
+
+.intro {
+    margin: 0 0 10px;
+    font-size: 13px;
+    line-height: 1.4;
+    color: #4b5563;
+}
+
+.hint {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: var(--muted);
+}
+
 /* ---- Buttons ---- */
 
 .btn {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    text-decoration: none;
     width: 100%;
     min-height: 40px;
     border-radius: 10px;
@@ -279,12 +357,12 @@ body.home {
 
 @media (min-width: 900px) {
     .home-page {
-        max-width: 860px;
+        max-width: 1000px;
         display: grid;
-        grid-template-columns: minmax(0, 1fr) 330px;
-        gap: 40px;
+        grid-template-columns: minmax(0, 1fr) 390px;
+        gap: 48px;
         align-items: center;
-        padding: 24px 32px;
+        padding: 28px 40px;
         box-sizing: border-box;
     }
 
@@ -301,80 +379,88 @@ body.home {
     }
 
     .hero-title {
-        font-size: 34px;
+        font-size: 40px;
     }
 
     .hero-tagline {
-        margin-top: 4px;
-        font-size: 15px;
+        margin-top: 6px;
+        font-size: 18px;
     }
 
     /* Nothing covers the kids' shoulders here, so fade them out instead of a hard edge. */
     .hero-art {
-        max-width: 380px;
+        max-width: 460px;
         -webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent 100%);
         mask-image: linear-gradient(to bottom, #000 82%, transparent 100%);
     }
 
-    /* Compact controls: a mouse pointer does not need phone-sized touch targets. */
+    /* Controls sized for a mouse pointer: smaller than the phone ones, larger than a dense desktop form. */
     .login-sheet {
         margin: 0;
-        padding: 24px 22px;
-        border-radius: 24px;
-        box-shadow: 0 14px 40px rgba(31, 42, 68, 0.16);
+        padding: 30px 28px;
+        border-radius: 28px;
+        box-shadow: 0 16px 48px rgba(31, 42, 68, 0.17);
     }
 
     .login-sheet h2 {
-        margin-bottom: 10px;
-        font-size: 19px;
+        margin-bottom: 12px;
+        font-size: 23px;
     }
 
     .field {
-        margin-bottom: 10px;
+        margin-bottom: 12px;
     }
 
     .field label {
-        margin-bottom: 4px;
-        font-size: 12px;
-    }
-
-    .field input {
-        height: 42px;
-        border-radius: 10px;
+        margin-bottom: 5px;
         font-size: 14px;
     }
 
-    .eye {
-        width: 20px;
-        height: 20px;
+    .field input {
+        height: 50px;
+        border-radius: 12px;
+        font-size: 16px;
+    }
+
+    .password-wrap input {
+        padding-right: 48px;
+    }
+
+    .eye-toggle {
+        width: 46px;
+    }
+
+    .eye-toggle svg {
+        width: 24px;
+        height: 24px;
     }
 
     .options {
-        margin: 2px 0 14px;
-        font-size: 12px;
+        margin: 2px 0 16px;
+        font-size: 14px;
     }
 
     .remember {
-        gap: 8px;
-        min-height: 32px;
+        gap: 10px;
+        min-height: 38px;
     }
 
     .remember input {
-        width: 18px;
-        height: 18px;
+        width: 21px;
+        height: 21px;
     }
 
     .forgot {
-        min-height: 32px;
+        min-height: 38px;
     }
 
     .btn {
-        min-height: 44px;
-        border-radius: 12px;
-        font-size: 15px;
+        min-height: 52px;
+        border-radius: 14px;
+        font-size: 17px;
     }
 
     .btn + .btn {
-        margin-top: 10px;
+        margin-top: 12px;
     }
 }

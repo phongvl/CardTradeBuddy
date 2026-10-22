@@ -1,34 +1,21 @@
-using CardTradeBuddy.Localization;
-using Microsoft.AspNetCore.Localization;
+using CardTradeBuddy.Pages.Account;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Localization;
 
 namespace CardTradeBuddy.Pages;
 
-public class IndexModel : PageModel
+/// <summary>The front page: the login box. Someone who is already logged in goes straight on to the card scanner.</summary>
+public class IndexModel(IStringLocalizer<SharedResource> localizer) : PageModel
 {
-    public void OnGet()
+    public LoginForm Form { get; private set; } = new();
+
+    public IActionResult OnGet()
     {
+        if (User.Identity?.IsAuthenticated == true)
+            return Redirect(LoginForm.HomePath);
 
-    }
-
-    // Remembers the chosen language in a cookie (which UseRequestLocalization reads) and reloads the page.
-    public IActionResult OnPostLanguage(string culture)
-    {
-        if (AppLanguages.Codes.Contains(culture))
-        {
-            Response.Cookies.Append(
-                CookieRequestCultureProvider.DefaultCookieName,
-                CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
-                new CookieOptions
-                {
-                    Expires = DateTimeOffset.UtcNow.AddYears(1),
-                    IsEssential = true,
-                    SameSite = SameSiteMode.Lax,
-                    Secure = Request.IsHttps,
-                });
-        }
-
-        return RedirectToPage();
+        Form = LoginForm.Fresh(Request, TempData, key => localizer[key]);
+        return Page();
     }
 }

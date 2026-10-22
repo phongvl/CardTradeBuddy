@@ -1,10 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>fe66311f-bb9a-4f7d-814f-0ad6fea041d5</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Local development secrets (the LoginServer client secret): read from the project folder, never copied to bin or to a publish. -->
+    <Content Update="appsettings.Development.local.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="OpenCvSharp4" Version="4.13.0.20260627" />

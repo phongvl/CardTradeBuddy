@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <!-- Default language (English). Translations live in SharedResource.<culture>.resx next to this file. -->
+  <data name="Tagline" xml:space="preserve"><value>Fair trades for card fans</value></data>
+  <data name="HeroArtLabel" xml:space="preserve"><value>Two kids cheering with trading cards and a green fair-trade shield</value></data>
+  <data name="LanguageNavLabel" xml:space="preserve"><value>Language</value></data>
+  <data name="LoginTitle" xml:space="preserve"><value>Log in</value></data>
+  <data name="Welcome" xml:space="preserve"><value>Welcome back</value></data>
+  <data name="Email" xml:space="preserve"><value>Email</value></data>
+  <data name="EmailPlaceholder" xml:space="preserve"><value>name@example.com</value></data>
+  <data name="Password" xml:space="preserve"><value>Password</value></data>
+  <data name="PasswordPlaceholder" xml:space="preserve"><value>Your password</value></data>
+  <data name="RememberMe" xml:space="preserve"><value>Remember me</value></data>
+  <data name="ForgotPassword" xml:space="preserve"><value>I forgot my password</value></data>
+  <data name="LogIn" xml:space="preserve"><value>Log in</value></data>
+  <data name="CreateUser" xml:space="preserve"><value>Create user</value></data>
+  <data name="LogOut" xml:space="preserve"><value>Log out</value></data>
+  <data name="SignedInAs" xml:space="preserve"><value>Signed in as {0}</value></data>
+  <data name="EmailRequired" xml:space="preserve"><value>Enter your email address.</value></data>
+  <data name="InvalidEmail" xml:space="preserve"><value>That doesn&apos;t look like an email address.</value></data>
+  <data name="PasswordRequired" xml:space="preserve"><value>Enter your password.</value></data>
+  <data name="LoginInvalid" xml:space="preserve"><value>Wrong email or password.</value></data>
+  <data name="LoginLocked" xml:space="preserve"><value>Too many failed attempts. Try again in 15 minutes.</value></data>
+  <data name="LoginNoAccess" xml:space="preserve"><value>This user doesn&apos;t have access to CardTradeBuddy.</value></data>
+  <data name="LoginNotVerified" xml:space="preserve"><value>Confirm your email address first. Look for the link in your inbox.</value></data>
+  <data name="ServiceUnavailable" xml:space="preserve"><value>The login service isn&apos;t available right now. Try again in a moment.</value></data>
+  <data name="PasswordTooShort" xml:space="preserve"><value>Use at least {0} characters.</value></data>
+  <data name="PasswordsDiffer" xml:space="preserve"><value>The passwords don&apos;t match.</value></data>
+  <data name="ConfirmPassword" xml:space="preserve"><value>Repeat password</value></data>
+  <data name="BackToLogin" xml:space="preserve"><value>Back to log in</value></data>
+  <data name="RegisterTitle" xml:space="preserve"><value>Create user</value></data>
+  <data name="RegisterIntro" xml:space="preserve"><value>Create a user to start trading.</value></data>
+  <data name="PasswordHint" xml:space="preserve"><value>At least {0} characters.</value></data>
+  <data name="RegisterDone" xml:space="preserve"><value>Your user has been created. You can log in now.</value></data>
+  <data name="RegisterDoneVerify" xml:space="preserve"><value>Almost done! We&apos;ve sent you a link to confirm your email address.</value></data>
+  <data name="ForgotTitle" xml:space="preserve"><value>Forgot your password?</value></data>
+  <data name="ForgotIntro" xml:space="preserve"><value>Enter your email and we&apos;ll send you a link to choose a new password.</value></data>
+  <data name="ForgotSend" xml:space="preserve"><value>Send link</value></data>
+  <data name="ForgotSent" xml:space="preserve"><value>If there is a user with that email, a link has been sent. It works for one hour.</value></data>
+  <data name="ResetTitle" xml:space="preserve"><value>Choose a new password</value></data>
+  <data name="NewPassword" xml:space="preserve"><value>New password</value></data>
+  <data name="ResetSave" xml:space="preserve"><value>Save password</value></data>
+  <data name="ResetInvalid" xml:space="preserve"><value>This link doesn&apos;t work any more. Ask for a new one.</value></data>
+  <data name="ResetDone" xml:space="preserve"><value>Your password has been changed. Log in with your new password.</value></data>
+  <data name="RequestNewLink" xml:space="preserve"><value>Ask for a new link</value></data>
+  <data name="VerifyTitle" xml:space="preserve"><value>Confirm your email</value></data>
+  <data name="VerifyIntro" xml:space="preserve"><value>Press the button to confirm your email address.</value></data>
+  <data name="VerifyButton" xml:space="preserve"><value>Confirm email</value></data>
+  <data name="VerifyInvalid" xml:space="preserve"><value>This link doesn&apos;t work any more. Create your user again to get a new one.</value></data>
+  <data name="VerifyDone" xml:space="preserve"><value>Your email address is confirmed. You can log in now.</value></data>
+  <data name="ShowPassword" xml:space="preserve"><value>Show password</value></data>
+  <data name="HidePassword" xml:space="preserve"><value>Hide password</value></data>
+</root>
+

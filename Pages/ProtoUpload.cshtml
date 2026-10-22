@@ -5,6 +5,11 @@
     ViewData["Title"] = "Proto Upload";
 }
 
+<form method="post" asp-page="/Account/Logout" style="margin-bottom: 1rem;">
+    <span>@T["SignedInAs", User.Identity?.Name ?? ""]</span>
+    <button type="submit">@T["LogOut"]</button>
+</form>
+
 <h1>Proto Upload</h1>
 
 <form method="post" enctype="multipart/form-data">

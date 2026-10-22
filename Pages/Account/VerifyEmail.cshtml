@@ -1,0 +1,33 @@
+﻿@page
+@model CardTradeBuddy.Pages.Account.VerifyEmailModel
+@{
+    Layout = "_LayoutHome";
+    ViewData["Title"] = T["VerifyTitle"].Value;
+}
+
+<main class="home-page">
+    <partial name="_Hero" />
+
+    <section class="login-sheet" aria-labelledby="page-heading">
+        <span class="sheet-handle" aria-hidden="true"></span>
+        <h2 id="page-heading">@T["VerifyTitle"]</h2>
+
+        @if (Model.Error is not null)
+        {
+            <p class="message error" role="alert">@Model.Error</p>
+        }
+
+        @if (Model.TokenProblem)
+        {
+            <a class="btn btn-primary" asp-page="/Account/Register">@T["CreateUser"]</a>
+        }
+        else
+        {
+            <p class="intro">@T["VerifyIntro"]</p>
+            <form method="post">
+                <input type="hidden" name="Token" value="@Model.Token" />
+                <button type="submit" class="btn btn-primary">@T["VerifyButton"]</button>
+            </form>
+        }
+    </section>
+</main>

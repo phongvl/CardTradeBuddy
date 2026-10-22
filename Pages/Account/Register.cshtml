@@ -1,0 +1,43 @@
+﻿@page
+@model CardTradeBuddy.Pages.Account.RegisterModel
+@using CardTradeBuddy.Services
+@{
+    Layout = "_LayoutHome";
+    ViewData["Title"] = T["RegisterTitle"].Value;
+}
+
+<main class="home-page">
+    <partial name="_Hero" />
+
+    <section class="login-sheet" aria-labelledby="page-heading">
+        <span class="sheet-handle" aria-hidden="true"></span>
+        <h2 id="page-heading">@T["RegisterTitle"]</h2>
+
+        @if (Model.Done)
+        {
+            <p class="message notice" role="status">@Model.DoneMessage</p>
+            <a class="btn btn-primary" asp-page="/Account/Login">@T["BackToLogin"]</a>
+        }
+        else
+        {
+            <p class="intro">@T["RegisterIntro"]</p>
+            @if (Model.Error is not null)
+            {
+                <p class="message error" role="alert">@Model.Error</p>
+            }
+
+            <form method="post" novalidate>
+                <div class="field">
+                    <label for="email">@T["Email"]</label>
+                    <input id="email" name="Email" type="email" inputmode="email" autocomplete="email" placeholder="@T["EmailPlaceholder"]" value="@Model.Email" />
+                </div>
+
+                <partial name="_PasswordField" model="@(new PasswordFieldModel("password", "Password", T["Password"].Value, "new-password", Hint: T["PasswordHint", PasswordRules.MinLength].Value))" />
+                <partial name="_PasswordField" model="@(new PasswordFieldModel("confirm", "ConfirmPassword", T["ConfirmPassword"].Value, "new-password"))" />
+
+                <button type="submit" class="btn btn-primary">@T["CreateUser"]</button>
+                <a class="btn btn-secondary" asp-page="/Account/Login">@T["BackToLogin"]</a>
+            </form>
+        }
+    </section>
+</main>

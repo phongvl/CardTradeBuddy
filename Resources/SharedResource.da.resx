@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <!-- Dansk -->
+  <data name="Tagline" xml:space="preserve"><value>Fair bytter for kortfans</value></data>
+  <data name="HeroArtLabel" xml:space="preserve"><value>To børn der jubler med samlekort og et grønt skjold for fair bytte</value></data>
+  <data name="LanguageNavLabel" xml:space="preserve"><value>Sprog</value></data>
+  <data name="LoginTitle" xml:space="preserve"><value>Log ind</value></data>
+  <data name="Welcome" xml:space="preserve"><value>Velkommen tilbage</value></data>
+  <data name="Email" xml:space="preserve"><value>E-mail</value></data>
+  <data name="EmailPlaceholder" xml:space="preserve"><value>navn@eksempel.dk</value></data>
+  <data name="Password" xml:space="preserve"><value>Adgangskode</value></data>
+  <data name="PasswordPlaceholder" xml:space="preserve"><value>Din adgangskode</value></data>
+  <data name="RememberMe" xml:space="preserve"><value>Husk mig</value></data>
+  <data name="ForgotPassword" xml:space="preserve"><value>Jeg har glemt min adgangskode</value></data>
+  <data name="LogIn" xml:space="preserve"><value>Log ind</value></data>
+  <data name="CreateUser" xml:space="preserve"><value>Opret bruger</value></data>
+  <data name="LogOut" xml:space="preserve"><value>Log ud</value></data>
+  <data name="SignedInAs" xml:space="preserve"><value>Logget ind som {0}</value></data>
+  <data name="EmailRequired" xml:space="preserve"><value>Indtast din e-mailadresse.</value></data>
+  <data name="InvalidEmail" xml:space="preserve"><value>Det ligner ikke en e-mailadresse.</value></data>
+  <data name="PasswordRequired" xml:space="preserve"><value>Indtast din adgangskode.</value></data>
+  <data name="LoginInvalid" xml:space="preserve"><value>Forkert e-mail eller adgangskode.</value></data>
+  <data name="LoginLocked" xml:space="preserve"><value>For mange mislykkede forsøg. Prøv igen om 15 minutter.</value></data>
+  <data name="LoginNoAccess" xml:space="preserve"><value>Denne bruger har ikke adgang til CardTradeBuddy.</value></data>
+  <data name="LoginNotVerified" xml:space="preserve"><value>Bekræft først din e-mailadresse. Se efter linket i din indbakke.</value></data>
+  <data name="ServiceUnavailable" xml:space="preserve"><value>Login-tjenesten er ikke tilgængelig lige nu. Prøv igen om lidt.</value></data>
+  <data name="PasswordTooShort" xml:space="preserve"><value>Brug mindst {0} tegn.</value></data>
+  <data name="PasswordsDiffer" xml:space="preserve"><value>Adgangskoderne er ikke ens.</value></data>
+  <data name="ConfirmPassword" xml:space="preserve"><value>Gentag adgangskode</value></data>
+  <data name="BackToLogin" xml:space="preserve"><value>Tilbage til log ind</value></data>
+  <data name="RegisterTitle" xml:space="preserve"><value>Opret bruger</value></data>
+  <data name="RegisterIntro" xml:space="preserve"><value>Opret en bruger for at komme i gang med at bytte.</value></data>
+  <data name="PasswordHint" xml:space="preserve"><value>Mindst {0} tegn.</value></data>
+  <data name="RegisterDone" xml:space="preserve"><value>Din bruger er oprettet. Du kan nu logge ind.</value></data>
+  <data name="RegisterDoneVerify" xml:space="preserve"><value>Næsten færdig! Vi har sendt dig et link til at bekræfte din e-mailadresse.</value></data>
+  <data name="ForgotTitle" xml:space="preserve"><value>Har du glemt din adgangskode?</value></data>
+  <data name="ForgotIntro" xml:space="preserve"><value>Indtast din e-mail, så sender vi dig et link til at vælge en ny adgangskode.</value></data>
+  <data name="ForgotSend" xml:space="preserve"><value>Send link</value></data>
+  <data name="ForgotSent" xml:space="preserve"><value>Hvis der findes en bruger med den e-mail, er der sendt et link. Det virker i én time.</value></data>
+  <data name="ResetTitle" xml:space="preserve"><value>Vælg en ny adgangskode</value></data>
+  <data name="NewPassword" xml:space="preserve"><value>Ny adgangskode</value></data>
+  <data name="ResetSave" xml:space="preserve"><value>Gem adgangskode</value></data>
+  <data name="ResetInvalid" xml:space="preserve"><value>Dette link virker ikke længere. Bed om et nyt.</value></data>
+  <data name="ResetDone" xml:space="preserve"><value>Din adgangskode er ændret. Log ind med din nye adgangskode.</value></data>
+  <data name="RequestNewLink" xml:space="preserve"><value>Bed om et nyt link</value></data>
+  <data name="VerifyTitle" xml:space="preserve"><value>Bekræft din e-mail</value></data>
+  <data name="VerifyIntro" xml:space="preserve"><value>Tryk på knappen for at bekræfte din e-mailadresse.</value></data>
+  <data name="VerifyButton" xml:space="preserve"><value>Bekræft e-mail</value></data>
+  <data name="VerifyInvalid" xml:space="preserve"><value>Dette link virker ikke længere. Opret din bruger igen for at få et nyt.</value></data>
+  <data name="VerifyDone" xml:space="preserve"><value>Din e-mailadresse er bekræftet. Du kan nu logge ind.</value></data>
+  <data name="ShowPassword" xml:space="preserve"><value>Vis adgangskode</value></data>
+  <data name="HidePassword" xml:space="preserve"><value>Skjul adgangskode</value></data>
+</root>
+

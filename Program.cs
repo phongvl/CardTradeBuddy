@@ -1,7 +1,9 @@
 ﻿using System.Threading.RateLimiting;
 using CardTradeBuddy.Localization;
 using CardTradeBuddy.Services;
+using CardTradeBuddy.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +29,10 @@ builder.Services.AddHttpClient<LoginServerClient>((sp, client) =>
         client.BaseAddress = new Uri(authority.TrimEnd('/') + "/");
     client.Timeout = TimeSpan.FromSeconds(15);
 });
+// The app's own database (PostgreSQL): per-user preferences such as the preferred language.
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+builder.Services.AddScoped<UserPreferences>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -73,6 +79,23 @@ var app = builder.Build();
 
 if (string.IsNullOrEmpty(app.Configuration[$"{LoginOptions.Section}:ClientSecret"]))
     app.Logger.LogWarning("Login:ClientSecret is not set, so logging in and creating users will not work. See the README, section Login.");
+
+// Creates the database tables (or brings them up to date) at startup. If the database is not reachable the site still starts;
+// logging in works, but preferences are not saved or loaded until it is.
+if (string.IsNullOrWhiteSpace(app.Configuration.GetConnectionString("Default")))
+    app.Logger.LogWarning("ConnectionStrings:Default is not set, so preferences (such as the preferred language) are not saved. See the README, section Database.");
+else
+{
+    try
+    {
+        using var scope = app.Services.CreateScope();
+        await scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.MigrateAsync();
+    }
+    catch (Exception ex)
+    {
+        app.Logger.LogError(ex, "The database could not be set up. Preferences are not saved until it is available.");
+    }
+}
 
 if (app.Environment.IsDevelopment())
 {

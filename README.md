@@ -21,9 +21,10 @@ ASP.NET Core Razor Pages on .NET 10. Hosted on Windows with IIS.
 10. [How prices are calculated](#how-prices-are-calculated)
 11. [How a trade is evaluated](#how-a-trade-is-evaluated)
 12. [Languages](#languages)
-13. [Front page design](#front-page-design)
-14. [Project layout](#project-layout)
-15. [Known limits](#known-limits)
+13. [Database (preferences)](#database-preferences)
+14. [Front page design](#front-page-design)
+15. [Project layout](#project-layout)
+16. [Known limits](#known-limits)
 
 ## Status
 
@@ -63,6 +64,7 @@ dotnet run
 | `Login:ClientId` | `cardtradebuddy` | The client id this app is registered under in the LoginServer. |
 | `Login:ClientSecret` | (none) | The app's secret in the LoginServer. **Never in the repo:** `appsettings.Development.local.json` (git-ignored) in development, `appsettings.Production.json` on the server. |
 | `Login:VerifyEmail` | `false` | `true`: new users must click a link in an email before they can log in. Needs the app's email sender set up in the LoginServer. |
+| `ConnectionStrings:Default` | (none) | The PostgreSQL database for per-user preferences (see [Database](#database-preferences)). **Never in the repo**, like the login secret. Without it the site works, but preferences are not saved. |
 | `Network:BehindCloudflare` | `false` | `true`: trust Cloudflare's `CF-Connecting-IP` header as the visitor's address (for the rate limit). Only set it if the site really is behind Cloudflare. |
 | `RateLimit:AuthPerMinute` | `10` | Requests per minute from one address to the login and account pages. |
 
@@ -209,6 +211,7 @@ It is safe to run again and again. What it does, in order:
 | `-SkipHttps` | off | HTTP bindings only |
 | `-PoolCredential` | (built-in identity) | Run the pool as a specific account: `-PoolCredential (Get-Credential)` |
 | `-LoginClientSecret` | (keep the stored one) | The LoginServer client secret. Give it once; it is saved in `appsettings.Production.json` and kept on later deployments. |
+| `-DatabaseConnectionString` | (keep the stored one) | The PostgreSQL connection string for preferences, or put it on one line in `Scripts\prod.connection.local`. Saved in `appsettings.Production.json`. See [Database](#database-preferences). |
 | `-LoginVerifyEmail` | (keep) | `true` or `false`: sets `Login:VerifyEmail`. |
 | `-BehindCloudflare` | off | Sets `Network:BehindCloudflare` to true. |
 | `-SkipIisSetup` | off | Only publish and copy, do not touch IIS |
@@ -425,11 +428,38 @@ English and Danish, using standard ASP.NET Core localization.
   browser's `Accept-Language` header, else English.
 - The flags in the upper-left corner are buttons that post their language to `/set-language`. It stores the choice in
   the cookie for one year and returns to the page the visitor came from. It works without JavaScript.
+- When a **logged-in** user picks a language, it is also saved as their preferred language (see [Database](#database-preferences)).
+  At the next login, on any device, the saved language replaces the browser's cookie. A visitor who is not logged in only gets the cookie.
 - The page's `lang` attribute follows the chosen language.
 - Numbers also follow the language, so on `/ProtoUpload` a Danish visitor sees `0,04` and an English one `0.04`.
 
 **To add a language:** add its code to `Localization/AppLanguages.cs`, add a `SharedResource.<code>.resx` next to the
 existing ones, and add a flag button to the language switch in `Pages/Shared/_Hero.cshtml`.
+
+## Database (preferences)
+
+The app has its own PostgreSQL database for settings that belong to a user. People and passwords stay in the LoginServer; this
+database only knows a user by the LoginServer user id (the `NameIdentifier` claim).
+
+| Table `user_preferences` | Type | Meaning |
+| --- | --- | --- |
+| `UserId` (primary key) | `varchar(64)` | The LoginServer user id. |
+| `Language` | `varchar(10)`, null | The language the user last picked (`en`, `da`), or null. |
+| `UpdatedAt` | `timestamptz` | When the row last changed. |
+
+A new setting is a new column: add a property to `Data/UserPreference.cs`, then `dotnet ef migrations add <Name> -o Data/Migrations`
+(the tool is in `.config/dotnet-tools.json`; run `dotnet tool restore` once; add `--configuration Release` if the debugger has the
+Debug build locked).
+
+- **Tables are created at startup** (`Database.MigrateAsync`), so a new database only has to exist. If the database is missing or
+  unreachable the site still starts and logins work: the error is logged and preferences are simply not saved or loaded.
+- **Saving:** `/set-language` writes the language when the user is logged in (`Services/UserPreferences.cs`).
+- **Loading:** at login, `Account/Login` reads the saved language and sets the language cookie to it.
+- **Development:** create an empty database (`create database cardtradebuddy_dev;`) and put the connection string in the git-ignored
+  `appsettings.Development.local.json`: `{ "ConnectionStrings": { "Default": "Host=localhost;Port=5432;Database=cardtradebuddy_dev;Username=...;Password=..." } }`.
+- **Production:** create an empty `cardtradebuddy_prod` database, then deploy once with `-DatabaseConnectionString '...'` (or put the
+  connection string on one line in `Scripts\prod.connection.local`, git-ignored). It is saved in `appsettings.Production.json` and kept
+  on later deployments. The script refuses a connection string that names a `_dev` database.
 
 ## Front page design
 
@@ -461,6 +491,7 @@ Pages/
 Services/
   LoginServerClient.cs       Login, create user, confirm email, password reset (calls the LoginServer)
   ClientIp.cs, EmailAddress.cs, PasswordRules.cs, RememberedEmailCookie.cs   Small helpers for the login
+  UserPreferences.cs         Reads and saves a logged-in user's preferences (the preferred language)
   CardImagePreprocessor.cs   Find the card, straighten it, build the compact image (OpenCvSharp)
   OllamaLlmService.cs        Vision model calls and model list (ILlmService)
   TcgDexCardDataProvider.cs  Card lookup, set cross-check, stale-price retry (ICardDataProvider)
@@ -468,7 +499,8 @@ Services/
   PriceCalculator.cs         Estimated price per finish, outlier filtering
   FrankfurterExchangeRateService.cs   USD -> EUR rate, cached (IExchangeRateService)
   TradeEvaluator.cs          Fair-trade check and TradeOptions
-Localization/AppLanguages.cs Supported languages
+Localization/              AppLanguages (supported languages), LanguageCookie (sets the language cookie)
+Data/                      AppDbContext, UserPreference (table user_preferences) and Migrations/
 Resources/                   SharedResource.resx (English) and SharedResource.da.resx (Danish)
 Scripts/deploy.ps1           IIS setup and deployment
 wwwroot/css/home.css         Front page styles

@@ -27,6 +27,11 @@
     the app pool) and kept on later deployments, because the file is left alone when the files are mirrored. The same file also
     takes -LoginVerifyEmail and -BehindCloudflare. Other settings in that file are never touched.
 
+    Database: the app keeps per-user preferences (the preferred language) in its own PostgreSQL database and creates its tables at
+    startup. Give the connection string once with -DatabaseConnectionString, or put it on one line in Scripts\prod.connection.local
+    (git-ignored); it is written to appsettings.Production.json as ConnectionStrings:Default and kept on later deployments.
+    Create the empty database first (for example cardtradebuddy_prod). Never use the development database.
+
     By default the pool runs as the built-in ApplicationPoolIdentity (IIS AppPool\CardTradeBuddy), which needs
     no password. To run it as a specific account instead, pass -PoolCredential (Get-Credential); the password
     is only kept in memory for this run and is stored by IIS, never written to this script.
@@ -39,6 +44,7 @@
     .\Scripts\deploy.ps1 -CreateSelfSignedCert         # testing only: browsers will warn
     .\Scripts\deploy.ps1 -SkipHttps                    # http bindings only
     .\Scripts\deploy.ps1 -LoginClientSecret '...'      # first time: store the LoginServer client secret
+    .\Scripts\deploy.ps1 -DatabaseConnectionString 'Host=localhost;Database=cardtradebuddy_prod;Username=...;Password=...'
 #>
 [CmdletBinding()]
 param(
@@ -54,6 +60,7 @@ param(
     [switch]$SkipHttps,
     [pscredential]$PoolCredential,
     [string]$LoginClientSecret,
+    [string]$DatabaseConnectionString,
     [ValidateSet('true', 'false')][string]$LoginVerifyEmail,
     [switch]$BehindCloudflare,
     [switch]$SkipIisSetup
@@ -237,6 +244,20 @@ function Set-ProductionSettings {
     if ($LoginVerifyEmail)   { Set-Value 'Login' 'VerifyEmail' ($LoginVerifyEmail -eq 'true'); $changed = $true }
     if ($BehindCloudflare)   { Set-Value 'Network' 'BehindCloudflare' $true; $changed = $true }
 
+    # Database connection string: -DatabaseConnectionString, else Scripts\prod.connection.local, else what is already stored.
+    $connectionFile = Join-Path $PSScriptRoot 'prod.connection.local'
+    $connection = $DatabaseConnectionString
+    if (-not $connection -and (Test-Path $connectionFile)) {
+        $connection = (Get-Content $connectionFile -Raw).Trim()
+        Write-Host 'Using the connection string from Scripts\prod.connection.local'
+    }
+    if ($connection) {
+        if ($connection -match '(?i)Database\s*=\s*[^;]*(_dev|development)') {
+            throw 'That looks like a development database. Use a separate production database (for example cardtradebuddy_prod).'
+        }
+        Set-Value 'ConnectionStrings' 'Default' $connection; $changed = $true
+    }
+
     if ($changed) {
         # No byte order mark: some tools choke on it.
         [IO.File]::WriteAllText($file, ($settings | ConvertTo-Json -Depth 10), (New-Object Text.UTF8Encoding($false)))
@@ -252,6 +273,9 @@ function Set-ProductionSettings {
     $hasSecret = $settings.Contains('Login') -and $settings['Login'].Contains('ClientSecret') -and $settings['Login']['ClientSecret']
     if (-not $hasSecret) {
         Write-Warning 'No LoginServer client secret is stored yet, so nobody can log in. Run again with -LoginClientSecret <secret> (see the README, section Login).'
+    }
+    if (-not ($settings.Contains('ConnectionStrings') -and $settings['ConnectionStrings'].Contains('Default'))) {
+        Write-Warning 'No database connection string is stored yet, so preferences (the preferred language) are not saved. Run again with -DatabaseConnectionString <connection string> (see the README, section Database).'
     }
 }
 

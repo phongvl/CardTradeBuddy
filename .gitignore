@@ -483,3 +483,6 @@ $RECYCLE.BIN/
 
 # Local development settings and secrets (LoginServer client secret): never commit
 appsettings.Development.local.json
+
+# Server-side values for the deploy script (never commit)
+Scripts/*.local

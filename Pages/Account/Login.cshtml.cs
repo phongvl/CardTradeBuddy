@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using CardTradeBuddy.Localization;
 using CardTradeBuddy.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -14,7 +15,7 @@ namespace CardTradeBuddy.Pages.Account;
 /// page then starts the session (a cookie). Also the page a not-logged-in visitor lands on when opening a protected page.
 /// </summary>
 [EnableRateLimiting("auth")]
-public class LoginModel(LoginServerClient loginServer, IStringLocalizer<SharedResource> localizer, IWebHostEnvironment environment) : PageModel
+public class LoginModel(LoginServerClient loginServer, UserPreferences preferences, IStringLocalizer<SharedResource> localizer, IWebHostEnvironment environment) : PageModel
 {
     /// <summary>"Remember me": the login cookie lasts this many days instead of ending when the browser closes.</summary>
     public const int RememberDays = 30;
@@ -93,6 +94,10 @@ public class LoginModel(LoginServerClient loginServer, IStringLocalizer<SharedRe
             AllowRefresh = true,
         };
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), properties);
+
+        // The user's preferred language (saved when they last picked one) wins over this browser's cookie, so it follows them to any device.
+        if (await preferences.GetLanguageAsync(user.Id, HttpContext.RequestAborted) is { } language)
+            LanguageCookie.Set(HttpContext, language);
 
         if (RememberMe) RememberedEmailCookie.Set(HttpContext, user.Email, RememberDays);
         else RememberedEmailCookie.Clear(HttpContext);

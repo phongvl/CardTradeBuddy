@@ -15,7 +15,7 @@ namespace CardTradeBuddy.Pages.Account;
 /// page then starts the session (a cookie). Also the page a not-logged-in visitor lands on when opening a protected page.
 /// </summary>
 [EnableRateLimiting("auth")]
-public class LoginModel(LoginServerClient loginServer, UserPreferences preferences, FormGuard guard, IStringLocalizer<SharedResource> localizer, IWebHostEnvironment environment) : PageModel
+public class LoginModel(LoginServerClient loginServer, UserPreferences preferences, FormChecks checks, IStringLocalizer<SharedResource> localizer, IWebHostEnvironment environment) : PageModel
 {
     /// <summary>"Remember me": the login cookie lasts this many days instead of ending when the browser closes.</summary>
     public const int RememberDays = 30;
@@ -51,7 +51,7 @@ public class LoginModel(LoginServerClient loginServer, UserPreferences preferenc
     /// <summary>Checks the credentials with the LoginServer and starts the session. Returns a visitor-safe error message, or null on success.</summary>
     private async Task<string?> SignInAsync()
     {
-        if (!guard.IsValid(Request)) return localizer["FormExpired"];
+        if (await checks.CheckAsync(HttpContext) is { } formProblem) return localizer[formProblem];
 
         var email = (Email ?? "").Trim();
         if (email.Length == 0) return localizer["EmailRequired"];

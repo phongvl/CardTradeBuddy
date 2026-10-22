@@ -69,5 +69,6 @@
   <data name="BirthdayInvalid" xml:space="preserve"><value>That birthday does not look right. Pick a real date.</value></data>
   <data name="BirthdayTooYoung" xml:space="preserve"><value>You must be at least {0} years old to create a user.</value></data>
   <data name="FormExpired" xml:space="preserve"><value>The form was not sent. Reload the page and try again.</value></data>
+  <data name="TurnstileFailed" xml:space="preserve"><value>We could not check that you are a person. Wait a moment and try again.</value></data>
 </root>
 

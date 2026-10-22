@@ -12,7 +12,7 @@ namespace CardTradeBuddy.Pages.Account;
 /// scanners open links automatically, and that must not be able to use up the link.
 /// </summary>
 [EnableRateLimiting("auth")]
-public class VerifyEmailModel(LoginServerClient loginServer, IStringLocalizer<SharedResource> localizer) : PageModel
+public class VerifyEmailModel(LoginServerClient loginServer, FormChecks checks, IStringLocalizer<SharedResource> localizer) : PageModel
 {
     [BindProperty(SupportsGet = true)] public string? Token { get; set; }
 
@@ -36,6 +36,12 @@ public class VerifyEmailModel(LoginServerClient loginServer, IStringLocalizer<Sh
         {
             TokenProblem = true;
             Error = localizer["VerifyInvalid"];
+            return Page();
+        }
+
+        if (await checks.CheckAsync(HttpContext, timing: false) is { } formProblem)
+        {
+            Error = localizer[formProblem];
             return Page();
         }
 

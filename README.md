@@ -66,6 +66,8 @@ dotnet run
 | `Login:VerifyEmail` | `false` | `true`: new users must click a link in an email before they can log in. Needs the app's email sender set up in the LoginServer. |
 | `ConnectionStrings:Default` | (none) | The PostgreSQL database for per-user preferences (see [Database](#database-preferences)). **Never in the repo**, like the login secret. Without it the site works, but preferences are not saved. |
 | `Account:MinimumAge` | `13` | The youngest age that may create a user (checked against the birthday given at sign-up). |
+| `Turnstile:SiteKey` | (none) | Cloudflare Turnstile's public key (goes in the page). With `Turnstile:SecretKey` it switches the check on. |
+| `Turnstile:SecretKey` | (none) | Turnstile's private key, used to check the visitor's answer with Cloudflare. **Never in the repo**, like the other secrets. |
 | `Network:BehindCloudflare` | `false` | `true`: trust Cloudflare's `CF-Connecting-IP` header as the visitor's address (for the rate limit). Only set it if the site really is behind Cloudflare. |
 | `RateLimit:AuthPerMinute` | `10` | Requests per minute from one address to the login and account pages. |
 
@@ -117,6 +119,13 @@ ResetPassword, VerifyEmail, Logout); the front page shows the same login box.
   forgot and reset password): a hidden trap field that people never see and bots fill in, plus a signed time stamp. A post that
   comes in less than 2 seconds after the form was shown, more than 8 hours after, or with the trap filled, is refused with
   "The form was not sent. Reload the page and try again." This only stops simple bots; the rate limit and the LoginServer's lockout do the rest.
+- **Cloudflare Turnstile** (`Services/Turnstile.cs`, partial `Pages/Shared/_Turnstile.cshtml`) on the forms an anonymous visitor
+  submits: login (front page and `/Account/Login`), create user, forgot password, reset password and confirm email. The widget gets a
+  one-time token from Cloudflare; the server checks it with Cloudflare (`siteverify`, with the visitor's address) before doing
+  anything else with the post, and refuses with "We could not check that you are a person" if it is missing, wrong, used before or
+  expired. If Cloudflare cannot be reached the post is refused too (the widget could not have loaded either). Not on the language
+  switch, log out and the card upload: those are one-click or for logged-in users, and have the anti-forgery token.
+  `FormChecks` runs the form guard and Turnstile in one call. Turnstile is **off when the keys are not set**, so the site still works.
 - **Rate limit:** 10 requests a minute per address to the login and account pages (`RateLimit:AuthPerMinute`); more get
   HTTP 429. The LoginServer also locks an account for 15 minutes after 5 wrong passwords.
 - **No account enumeration:** creating a user with an existing email, and asking for a password reset for an unknown
@@ -128,6 +137,18 @@ ResetPassword, VerifyEmail, Logout); the front page shows the same login box.
 - **Email links** (confirm email) only show a button; the address is confirmed when the button is pressed, because mail
   programs and virus scanners open links automatically and must not be able to use them up.
 - **The client secret** is never in the repo.
+
+### Turnstile setup
+
+1. In the Cloudflare dashboard open **Turnstile** and **Add widget**: name `CardTradeBuddy`, hostnames `cardtradebuddy.com` and
+   `www.cardtradebuddy.com`, widget mode **Managed**. Copy the **site key** and the **secret key**.
+2. On the server, once: `.\Scripts\deploy.ps1 -TurnstileSiteKey '<site key>' -TurnstileSecretKey '<secret key>'` (saved in
+   `appsettings.Production.json`, kept on later deployments).
+3. **Development:** Cloudflare publishes test keys that work on any host: site key `1x00000000000000000000AA` and secret key
+   `1x0000000000000000000000000000000AA` always pass (the widget shows a "testing only" banner). Put them under `Turnstile` in
+   `appsettings.Development.local.json`. The secret `2x0000000000000000000000000000000AA` always fails, to try the error message.
+4. If every post is refused after deploying, the log says `Turnstile:SecretKey is not accepted by Cloudflare`: the keys do not match
+   (or the widget does not list the host name the site is opened on).
 
 ### Set it up (once)
 
@@ -225,6 +246,7 @@ It is safe to run again and again. What it does, in order:
 | `-PoolCredential` | (built-in identity) | Run the pool as a specific account: `-PoolCredential (Get-Credential)` |
 | `-LoginClientSecret` | (keep the stored one) | The LoginServer client secret. Give it once; it is saved in `appsettings.Production.json` and kept on later deployments. |
 | `-DatabaseConnectionString` | (keep the stored one) | The PostgreSQL connection string for preferences, or put it on one line in `Scripts\prod.connection.local`. Saved in `appsettings.Production.json`. See [Database](#database-preferences). |
+| `-TurnstileSiteKey`, `-TurnstileSecretKey` | (keep the stored ones) | Cloudflare Turnstile keys. Give them once; saved in `appsettings.Production.json` and kept on later deployments. See [Turnstile setup](#turnstile-setup). |
 | `-LoginVerifyEmail` | (keep the stored one) | `true` or `false`: sets `Login:VerifyEmail`. Give it once; it is saved in `appsettings.Production.json` and kept on later deployments. |
 | `-BehindCloudflare` | off | Sets `Network:BehindCloudflare` to true. |
 | `-SkipIisSetup` | off | Only publish and copy, do not touch IIS |
@@ -507,7 +529,8 @@ Pages/
   Shared/_Layout.cshtml      HTML shell (language attribute, optional Head section)
   Shared/_LayoutHome.cshtml  The cheerful look used by the front page and the account pages
   Shared/_Hero.cshtml        Flags, title, tagline and the illustration (_HeroArtLogin, or _HeroArtRegister when a page sets ViewData["HeroArt"] = "register")
-  Shared/_FormGuard.cshtml   The hidden trap field and time stamp inside the public forms
+  Shared/_FormGuard.cshtml   The hidden trap field, time stamp and Turnstile widget inside the public forms
+  Shared/_Turnstile.cshtml   The Cloudflare Turnstile widget
   Shared/_LoginSheet.cshtml  The login box
   Shared/_PasswordField.cshtml  A password field with the show/hide eye button
 Services/
@@ -516,6 +539,8 @@ Services/
   UserPreferences.cs         Reads and saves a logged-in user's preferences (the preferred language)
   UserProfiles.cs, BirthDate.cs   Saves and checks the birthday given at sign-up
   FormGuard.cs               Trap field and time stamp check for the public forms
+  Turnstile.cs               Cloudflare Turnstile: settings and the server-side token check
+  FormChecks.cs              Runs the form guard and Turnstile for a form post
   CardImagePreprocessor.cs   Find the card, straighten it, build the compact image (OpenCvSharp)
   OllamaLlmService.cs        Vision model calls and model list (ILlmService)
   TcgDexCardDataProvider.cs  Card lookup, set cross-check, stale-price retry (ICardDataProvider)

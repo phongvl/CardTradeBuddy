@@ -473,3 +473,10 @@ body.home {
     height: 1px;
     overflow: hidden;
 }
+
+/* ---- Cloudflare Turnstile widget (see Pages/Shared/_Turnstile.cshtml) ---- */
+
+.cf-turnstile {
+    margin: 0 0 12px;
+    min-height: 65px;
+}

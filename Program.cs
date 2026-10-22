@@ -36,6 +36,12 @@ builder.Services.AddScoped<UserPreferences>();
 builder.Services.AddScoped<UserProfiles>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<FormGuard>();
+builder.Services.AddHttpClient<TurnstileVerifier>(client =>
+{
+    client.BaseAddress = new Uri("https://challenges.cloudflare.com/");
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
+builder.Services.AddScoped<FormChecks>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {

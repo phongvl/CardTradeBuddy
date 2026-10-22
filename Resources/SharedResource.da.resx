@@ -69,5 +69,6 @@
   <data name="BirthdayInvalid" xml:space="preserve"><value>Fødselsdagen ser ikke rigtig ud. Vælg en rigtig dato.</value></data>
   <data name="BirthdayTooYoung" xml:space="preserve"><value>Du skal være mindst {0} år for at oprette en bruger.</value></data>
   <data name="FormExpired" xml:space="preserve"><value>Formularen blev ikke sendt. Genindlæs siden og prøv igen.</value></data>
+  <data name="TurnstileFailed" xml:space="preserve"><value>Vi kunne ikke tjekke, at du er et menneske. Vent lidt og prøv igen.</value></data>
 </root>
 

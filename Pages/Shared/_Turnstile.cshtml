@@ -1,0 +1,8 @@
+@using System.Globalization
+@inject CardTradeBuddy.Services.TurnstileVerifier Turnstile
+@* The Cloudflare Turnstile widget. Renders nothing when Turnstile is not set up. The posted token is checked by FormChecks. *@
+@if (Turnstile.Enabled)
+{
+    <div class="cf-turnstile" data-sitekey="@Turnstile.SiteKey" data-size="flexible" data-theme="light" data-language="@CultureInfo.CurrentUICulture.TwoLetterISOLanguageName"></div>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+}

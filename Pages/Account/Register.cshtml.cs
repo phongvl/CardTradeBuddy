@@ -10,7 +10,7 @@ namespace CardTradeBuddy.Pages.Account;
 
 /// <summary>"Create user": this app's server asks the LoginServer to create the account. The LoginServer decides what the new user may do.</summary>
 [EnableRateLimiting("auth")]
-public class RegisterModel(LoginServerClient loginServer, UserProfiles profiles, FormGuard guard, IConfiguration configuration, IOptions<LoginOptions> options, IStringLocalizer<SharedResource> localizer) : PageModel
+public class RegisterModel(LoginServerClient loginServer, UserProfiles profiles, FormChecks checks, IConfiguration configuration, IOptions<LoginOptions> options, IStringLocalizer<SharedResource> localizer) : PageModel
 {
     [BindProperty] public string Email { get; set; } = "";
     [BindProperty] public string Password { get; set; } = "";
@@ -39,7 +39,7 @@ public class RegisterModel(LoginServerClient loginServer, UserProfiles profiles,
 
     public async Task<IActionResult> OnPostAsync()
     {
-        Error = guard.IsValid(Request) ? await SignUpAsync() : localizer["FormExpired"].Value;
+        Error = await checks.CheckAsync(HttpContext) is { } formProblem ? localizer[formProblem].Value : await SignUpAsync();
         if (Error is null)
         {
             Done = true;

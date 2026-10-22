@@ -8,7 +8,7 @@ namespace CardTradeBuddy.Pages.Account;
 
 /// <summary>The page the "forgot password" email links to: /Account/ResetPassword?token=...</summary>
 [EnableRateLimiting("auth")]
-public class ResetPasswordModel(LoginServerClient loginServer, FormGuard guard, IStringLocalizer<SharedResource> localizer) : PageModel
+public class ResetPasswordModel(LoginServerClient loginServer, FormChecks checks, IStringLocalizer<SharedResource> localizer) : PageModel
 {
     [BindProperty(SupportsGet = true)] public string? Token { get; set; }
     [BindProperty] public string NewPassword { get; set; } = "";
@@ -36,9 +36,9 @@ public class ResetPasswordModel(LoginServerClient loginServer, FormGuard guard, 
             Error = localizer["ResetInvalid"];
             return Page();
         }
-        if (!guard.IsValid(Request))
+        if (await checks.CheckAsync(HttpContext) is { } formProblem)
         {
-            Error = localizer["FormExpired"];
+            Error = localizer[formProblem];
             return Page();
         }
         if (NewPassword.Length < PasswordRules.MinLength)

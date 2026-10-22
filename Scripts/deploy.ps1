@@ -27,6 +27,10 @@
     the app pool) and kept on later deployments, because the file is left alone when the files are mirrored. The same file also
     takes -LoginVerifyEmail and -BehindCloudflare. Other settings in that file are never touched.
 
+    Cloudflare Turnstile (the "are you a person" check on the forms): create a widget in the Cloudflare dashboard (Turnstile) for
+    cardtradebuddy.com and www.cardtradebuddy.com and give its keys once with -TurnstileSiteKey and -TurnstileSecretKey; they are
+    written to appsettings.Production.json and kept on later deployments. Without both keys Turnstile is off.
+
     Database: the app keeps per-user preferences (the preferred language) in its own PostgreSQL database and creates its tables at
     startup. Give the connection string once with -DatabaseConnectionString, or put it on one line in Scripts\prod.connection.local
     (git-ignored); it is written to appsettings.Production.json as ConnectionStrings:Default and kept on later deployments.
@@ -44,6 +48,7 @@
     .\Scripts\deploy.ps1 -CreateSelfSignedCert         # testing only: browsers will warn
     .\Scripts\deploy.ps1 -SkipHttps                    # http bindings only
     .\Scripts\deploy.ps1 -LoginClientSecret '...'      # first time: store the LoginServer client secret
+    .\Scripts\deploy.ps1 -TurnstileSiteKey '0x4AAA...' -TurnstileSecretKey '0x4AAA...'   # first time: Cloudflare Turnstile keys
     .\Scripts\deploy.ps1 -DatabaseConnectionString 'Host=localhost;Database=cardtradebuddy_prod;Username=...;Password=...'
 #>
 [CmdletBinding()]
@@ -61,6 +66,8 @@ param(
     [pscredential]$PoolCredential,
     [string]$LoginClientSecret,
     [string]$DatabaseConnectionString,
+    [string]$TurnstileSiteKey,
+    [string]$TurnstileSecretKey,
     [ValidateSet('true', 'false')][string]$LoginVerifyEmail,
     [switch]$BehindCloudflare,
     [switch]$SkipIisSetup
@@ -243,6 +250,8 @@ function Set-ProductionSettings {
     if ($LoginClientSecret)  { Set-Value 'Login' 'ClientSecret' $LoginClientSecret; $changed = $true }
     if ($LoginVerifyEmail)   { Set-Value 'Login' 'VerifyEmail' ($LoginVerifyEmail -eq 'true'); $changed = $true }
     if ($BehindCloudflare)   { Set-Value 'Network' 'BehindCloudflare' $true; $changed = $true }
+    if ($TurnstileSiteKey)   { Set-Value 'Turnstile' 'SiteKey' $TurnstileSiteKey; $changed = $true }
+    if ($TurnstileSecretKey) { Set-Value 'Turnstile' 'SecretKey' $TurnstileSecretKey; $changed = $true }
 
     # Database connection string: -DatabaseConnectionString, else Scripts\prod.connection.local, else what is already stored.
     $connectionFile = Join-Path $PSScriptRoot 'prod.connection.local'
@@ -273,6 +282,9 @@ function Set-ProductionSettings {
     $hasSecret = $settings.Contains('Login') -and $settings['Login'].Contains('ClientSecret') -and $settings['Login']['ClientSecret']
     if (-not $hasSecret) {
         Write-Warning 'No LoginServer client secret is stored yet, so nobody can log in. Run again with -LoginClientSecret <secret> (see the README, section Login).'
+    }
+    if (-not ($settings.Contains('Turnstile') -and $settings['Turnstile'].Contains('SiteKey') -and $settings['Turnstile'].Contains('SecretKey'))) {
+        Write-Warning 'No Cloudflare Turnstile keys are stored yet, so the forms have no "are you a person" check. Run again with -TurnstileSiteKey and -TurnstileSecretKey (see the README, section Form protection).'
     }
     if (-not ($settings.Contains('ConnectionStrings') -and $settings['ConnectionStrings'].Contains('Default'))) {
         Write-Warning 'No database connection string is stored yet, so preferences (the preferred language) are not saved. Run again with -DatabaseConnectionString <connection string> (see the README, section Database).'

@@ -26,6 +26,7 @@
             <p class="intro">@T["VerifyIntro"]</p>
             <form method="post">
                 <input type="hidden" name="Token" value="@Model.Token" />
+                <partial name="_Turnstile" />
                 <button type="submit" class="btn btn-primary">@T["VerifyButton"]</button>
             </form>
         }

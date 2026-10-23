@@ -1,0 +1,55 @@
+@* The three card finish icons, defined once per page (include this partial once) and used with <use href="#finish-normal"> and so on.
+   Grey is "no shimmer" in all three: normal is all grey, holofoil has the rainbow shimmer inside the picture (star included),
+   reverse holofoil has it on the frame around a plain grey picture (star on the frame). The icons are 30 x 42 units. *@
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+        <clipPath id="finish-win"><rect x="4" y="4" width="22" height="17" rx="2" /></clipPath>
+        <clipPath id="finish-card"><rect x="0" y="0" width="30" height="42" rx="4" /></clipPath>
+        <g id="finish-stripes" transform="rotate(-35 15 21)">
+            <rect x="-30" y="-24" width="100" height="10" fill="#F472B6" />
+            <rect x="-30" y="-14" width="100" height="10" fill="#FACC15" />
+            <rect x="-30" y="-4" width="100" height="10" fill="#34D399" />
+            <rect x="-30" y="6" width="100" height="10" fill="#38BDF8" />
+            <rect x="-30" y="16" width="100" height="10" fill="#A78BFA" />
+            <rect x="-30" y="26" width="100" height="10" fill="#F472B6" />
+            <rect x="-30" y="36" width="100" height="10" fill="#FACC15" />
+            <rect x="-30" y="46" width="100" height="10" fill="#34D399" />
+        </g>
+        <path id="finish-star" d="M0 -5.5 L1.5 -1.5 L5.5 0 L1.5 1.5 L0 5.5 L-1.5 1.5 L-5.5 0 L-1.5 -1.5 Z" />
+        <path id="finish-hill" d="M4 21 L11 11 L15 16 L19 12 L26 21 Z" />
+
+        <g id="finish-normal">
+            <rect x="0" y="0" width="30" height="42" rx="4" fill="#CBD5E1" stroke="#475569" stroke-width="1.2" />
+            <rect x="4" y="4" width="22" height="17" rx="2" fill="#CBD5E1" />
+            <use href="#finish-hill" fill="#94A3B8" clip-path="url(#finish-win)" />
+            <rect x="4" y="4" width="22" height="17" rx="2" fill="none" stroke="#475569" stroke-width="0.9" />
+            <rect x="4" y="25" width="22" height="2.6" rx="1.3" fill="#94A3B8" />
+            <rect x="4" y="30" width="15" height="2.6" rx="1.3" fill="#94A3B8" />
+            <rect x="4" y="35" width="10" height="2.6" rx="1.3" fill="#94A3B8" />
+        </g>
+
+        <g id="finish-holofoil">
+            <rect x="0" y="0" width="30" height="42" rx="4" fill="#CBD5E1" stroke="#475569" stroke-width="1.2" />
+            <g clip-path="url(#finish-win)">
+                <use href="#finish-stripes" />
+                <use href="#finish-hill" fill="#1E293B" fill-opacity="0.3" />
+            </g>
+            <rect x="4" y="4" width="22" height="17" rx="2" fill="none" stroke="#475569" stroke-width="0.9" />
+            <use href="#finish-star" transform="translate(20.5,9.5) scale(1.05)" fill="#FFFFFF" stroke="#475569" stroke-width="0.5" stroke-linejoin="round" />
+            <rect x="4" y="25" width="22" height="2.6" rx="1.3" fill="#94A3B8" />
+            <rect x="4" y="30" width="15" height="2.6" rx="1.3" fill="#94A3B8" />
+            <rect x="4" y="35" width="10" height="2.6" rx="1.3" fill="#94A3B8" />
+        </g>
+
+        <g id="finish-reverseholofoil">
+            <g clip-path="url(#finish-card)"><use href="#finish-stripes" /></g>
+            <rect x="0" y="0" width="30" height="42" rx="4" fill="none" stroke="#475569" stroke-width="1.2" />
+            <rect x="4" y="4" width="22" height="17" rx="2" fill="#CBD5E1" />
+            <use href="#finish-hill" fill="#94A3B8" clip-path="url(#finish-win)" />
+            <rect x="4" y="4" width="22" height="17" rx="2" fill="none" stroke="#475569" stroke-width="0.9" />
+            <rect x="4" y="25" width="14" height="2.6" rx="1.3" fill="#FFFFFF" fill-opacity="0.9" />
+            <rect x="4" y="30" width="10" height="2.6" rx="1.3" fill="#FFFFFF" fill-opacity="0.9" />
+            <use href="#finish-star" transform="translate(23,33) scale(1.35)" fill="#FFFFFF" stroke="#475569" stroke-width="0.5" stroke-linejoin="round" />
+        </g>
+    </defs>
+</svg>

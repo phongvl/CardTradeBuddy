@@ -20,6 +20,7 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AuthorizePage("/ProtoUpload");
     options.Conventions.AuthorizePage("/Start");
     options.Conventions.AuthorizePage("/Check");
+    options.Conventions.AuthorizePage("/Album");
 }).AddViewLocalization();
 
 // Login: this app has its own login page and checks passwords with the LoginServer (server to server).

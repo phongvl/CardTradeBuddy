@@ -130,5 +130,17 @@
   <data name="DefaultAlbumName" xml:space="preserve"><value>Mine kort</value></data>
   <data name="AlbumErrUnavailable" xml:space="preserve"><value>Vi kunne ikke gemme kortet lige nu. Prøv igen om lidt.</value></data>
   <data name="CheckErrExpired" xml:space="preserve"><value>Dette resultat er for gammelt til at blive tilføjet. Tjek kortet igen.</value></data>
+  <data name="AlbumCountOne" xml:space="preserve"><value>1 kort</value></data>
+  <data name="AlbumCountMany" xml:space="preserve"><value>{0} kort</value></data>
+  <data name="AlbumEmpty" xml:space="preserve"><value>Der er ingen kort i dette album endnu.</value></data>
+  <data name="AlbumEmptyHint" xml:space="preserve"><value>Tjek et kort og tilføj det til dit album.</value></data>
+  <data name="AlbumPrev" xml:space="preserve"><value>Forrige</value></data>
+  <data name="AlbumNext" xml:space="preserve"><value>Næste</value></data>
+  <data name="AlbumPageLabel" xml:space="preserve"><value>Sider</value></data>
+  <data name="AlbumPageN" xml:space="preserve"><value>Side {0}</value></data>
+  <data name="AlbumNoImage" xml:space="preserve"><value>Intet billede</value></data>
+  <data name="FinishQuestion" xml:space="preserve"><value>Hvilken udgave har du?</value></data>
+  <data name="FinishRequired" xml:space="preserve"><value>Vælg hvilken udgave af kortet du har.</value></data>
+  <data name="AddedToAlbumFinish" xml:space="preserve"><value>Tilføjet til {0} som {1}.</value></data>
 </root>
 

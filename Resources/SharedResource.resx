@@ -130,5 +130,17 @@
   <data name="DefaultAlbumName" xml:space="preserve"><value>My cards</value></data>
   <data name="AlbumErrUnavailable" xml:space="preserve"><value>We could not save the card right now. Try again in a moment.</value></data>
   <data name="CheckErrExpired" xml:space="preserve"><value>This result is too old to add. Check the card again.</value></data>
+  <data name="AlbumCountOne" xml:space="preserve"><value>1 card</value></data>
+  <data name="AlbumCountMany" xml:space="preserve"><value>{0} cards</value></data>
+  <data name="AlbumEmpty" xml:space="preserve"><value>There are no cards in this album yet.</value></data>
+  <data name="AlbumEmptyHint" xml:space="preserve"><value>Check a card and add it to your album.</value></data>
+  <data name="AlbumPrev" xml:space="preserve"><value>Previous</value></data>
+  <data name="AlbumNext" xml:space="preserve"><value>Next</value></data>
+  <data name="AlbumPageLabel" xml:space="preserve"><value>Pages</value></data>
+  <data name="AlbumPageN" xml:space="preserve"><value>Page {0}</value></data>
+  <data name="AlbumNoImage" xml:space="preserve"><value>No picture</value></data>
+  <data name="FinishQuestion" xml:space="preserve"><value>Which version do you have?</value></data>
+  <data name="FinishRequired" xml:space="preserve"><value>Choose which version of the card you have.</value></data>
+  <data name="AddedToAlbumFinish" xml:space="preserve"><value>Added to {0} as {1}.</value></data>
 </root>
 

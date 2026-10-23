@@ -50,10 +50,10 @@ public class Card
 
     // ---- Price ----
 
-    /// <summary>The finish the estimated price is for: Normal, Holofoil, ReverseHolofoil or Unknown (the photo could not tell).</summary>
+    /// <summary>The version the user said they have: Normal, Holofoil or ReverseHolofoil. The estimated price is for this finish.</summary>
     public CardFinish Finish { get; set; }
 
-    /// <summary>True when the finish could not be seen and the price is for an assumed one.</summary>
+    /// <summary>Always false for cards saved by choosing a finish (kept for cards saved earlier, when the finish was guessed from the photo).</summary>
     public bool FinishAssumed { get; set; }
 
     /// <summary>The estimated price in euros for <see cref="Finish"/>, null when there was none (see <see cref="PriceCalculator"/>).</summary>

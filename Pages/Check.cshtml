@@ -8,16 +8,17 @@
 
 <main class="check-page">
     <header class="check-header">
+        <partial name="_LanguageSwitch" />
+        <h1 class="check-title">@T["StartCheckTitle"]</h1>
+        <partial name="_SavedCardsIcon" />
         <a class="check-back" asp-page="/Start" aria-label="@T["BackToStart"]">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 L7.5 12 L14.5 19" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
         </a>
-        <h1 class="check-title">@T["StartCheckTitle"]</h1>
-        <partial name="_SavedCardsIcon" />
-        <partial name="_LanguageSwitch" />
     </header>
 
     @if (Model.Result is { Card: { } card } result)
     {
+        <partial name="_FinishSprite" />
         @* ---- The answer ---- *@
         <section class="check-stage" aria-labelledby="result-name">
             <div class="check-panel check-result">
@@ -66,7 +67,7 @@
 
                     @if (Model.AddedTo is not null)
                     {
-                        <p class="message notice" role="status">@T["AddedToAlbum", Model.AddedTo]</p>
+                        <p class="message notice" role="status">@T["AddedToAlbumFinish", Model.AddedTo, Model.AddedFinish!]</p>
                     }
                     else if (Model.Token is not null)
                     {
@@ -76,6 +77,24 @@
                         }
                         <form method="post" asp-page-handler="Add" class="result-add">
                             <input type="hidden" name="token" value="@Model.Token" />
+
+                            @* The user says which version they have, so the right price is saved. Nothing is chosen beforehand. *@
+                            <fieldset class="finish-choice">
+                                <legend>@T["FinishQuestion"]</legend>
+                                <div class="finish-options">
+                                    @foreach (var option in new[] { CardFinish.Normal, CardFinish.Holofoil, CardFinish.ReverseHolofoil })
+                                    {
+                                        <label class="finish-option">
+                                            <input type="radio" name="finish" value="@option" required />
+                                            <span class="finish-tile">
+                                                <svg class="finish-icon" viewBox="0 0 30 42" aria-hidden="true"><use href="#finish-@option.ToString().ToLowerInvariant()" /></svg>
+                                                <span class="finish-name">@Model.FinishName(option)</span>
+                                            </span>
+                                        </label>
+                                    }
+                                </div>
+                            </fieldset>
+
                             <button type="submit" class="btn btn-primary">@T["AddToAlbum"]</button>
                         </form>
                     }

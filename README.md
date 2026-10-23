@@ -74,6 +74,7 @@ dotnet run
 | `Network:BehindCloudflare` | `false` | `true`: trust Cloudflare's `CF-Connecting-IP` header as the visitor's address (for the rate limit). Only set it if the site really is behind Cloudflare. |
 | `RateLimit:AuthPerMinute` | `10` | Requests per minute from one address to the login and account pages. |
 | `RateLimit:ScanPerMinute` | `12` | Requests per minute from one logged-in user to the Check a card page. |
+| `Album:PageSize` | `50` | How many cards the album page shows per page (1 to 200). |
 | `Check:Model` | `qwen3-vl:8b` | The Ollama model the Check page uses to read cards. |
 
 Settings that must not be in the repo live outside it. In development: the git-ignored `appsettings.Development.local.json` in the project folder, for example `{ "Login": { "Authority": "https://localhost:5001", "ClientSecret": "..." } }` (`dotnet user-secrets` works too). On the server: `appsettings.Production.json` in the site folder, which `deploy.ps1` writes and never overwrites.
@@ -517,8 +518,8 @@ Users created before the birthday was asked for have no `user_profiles` row.
 | `SetId`, `SetName`, `SetOfficialCardCount` | text, int | The set. |
 | `ImageUrl`, `SetLogoUrl` | text | Addresses of the card picture and the set logo on TCGdex's servers. The user's own photo is **never** stored. |
 | `Hp`, `Stage`, `Types` (`text[]`), `Retreat` | | Card facts. |
-| `Finish` | text | `Normal`, `Holofoil`, `ReverseHolofoil` or `Unknown`: the finish the price is for. |
-| `FinishAssumed` | `boolean` | True when the finish could not be seen on the photo and the price is for an assumed one. |
+| `Finish` | text | The version the user said they have: `Normal`, `Holofoil` or `ReverseHolofoil` (chosen when the card is added). The price is for this finish. |
+| `FinishAssumed` | `boolean` | Always false now (the user chooses the finish); kept for cards saved while the finish was still guessed from the photo. |
 | `EstimatedPriceEur` | `numeric(12,2)` | The calculated price in EUR for `Finish`, null when there was none. |
 | `Pricing` | `jsonb` | Every marketplace figure TCGdex had (Cardmarket EUR, TCGplayer USD), as received (`CardPricing`). |
 | `PricesCheckedAt` | `timestamptz` | **When the price was last looked up.** A later price refresh should update `Pricing`, `EstimatedPriceEur` and this. |
@@ -572,9 +573,8 @@ The page after login (`Pages/Start.cshtml`, styles at the end of `home.css`). Th
 - The pictures are inline SVGs, so there are no image files and they scale to any width. The texts are in the resource files
   (`StartCheckTitle`, `StartSwapText`, ...), English and Danish.
 - The language flags are the shared partial `_LanguageSwitch.cshtml` (also used by the hero on the login pages).
-- **Saved cards icon** (`Pages/Shared/_SavedCardsIcon.cshtml`): two stacked cards with a bookmark, in the header of the logged-in pages
-  (Start and Check), shown only when logged in. It is only an icon for now (a `<span>`, not a link): nothing is behind it yet. When the
-  page exists, make it an `<a asp-page="...">` with the same `saved-icon` class. Texts: `SavedCards` (en "Saved cards", da "Gemte kort").
+- **Saved cards icon** (`Pages/Shared/_SavedCardsIcon.cshtml`): two stacked cards with a bookmark, in the header of Start and Check, shown only
+  when logged in. It opens the [album page](#album-page). Texts: `SavedCards` (en "Saved cards", da "Gemte kort").
 - `/ProtoUpload` (the developer test page with the model dropdown and raw data) is unchanged and still reachable directly.
 
 ### Check a card page
@@ -596,10 +596,15 @@ a blue panel with a viewfinder picture, **Take a photo** and **Upload an image**
    page) and the price per finish. If the finish could not be seen, it says which version the price is for. A photo that cannot be
    used (not an image, over 12 MB, not a Pokémon card, unreadable, not in the list, reader offline) gives a message and the choose
    screen again.
-5. **Add to album.** Under the answer, **Add to my album** puts the card in the user's default album (created the first time). The
-   result travels in a signed, sealed hidden field (data protection, valid 30 minutes), so what is added cannot be changed from the
-   browser; a tampered or too old field gives "This result is too old to add". The same card added twice within 30 seconds (a double
-   press or a refresh) is saved once. After adding, the page says "Added to My cards" and "Check another card" becomes the main button.
+5. **Add to album.** Under the answer the user must say **which version they have**: three tiles with the finish icons, Normal, Holofoil and
+   Reverse holofoil (grey means no shimmer: normal is all grey, holofoil has the rainbow shimmer and a star inside the picture, reverse
+   holofoil has it on the frame around a plain picture; the icons are the sprite `Pages/Shared/_FinishSprite.cshtml`). Nothing is chosen
+   beforehand (the photo cannot tell foil reliably), the browser will not send the form until one is picked (`required`), and the server
+   refuses a missing or unknown value. **Add to my album** then puts the card in the user's default album (created the first time),
+   saved with that finish and the price calculated for exactly that finish. The result travels in a signed, sealed hidden field (data
+   protection, valid 30 minutes), so what is added cannot be changed from the browser; a tampered or too old field gives "This result
+   is too old to add". The same card and finish added twice within 30 seconds (a double press or a refresh) is saved once. After adding,
+   the page says "Added to My cards as Holofoil" and "Check another card" becomes the main button.
 
 **The camera screen** (full screen, `getUserMedia`, back camera on phones): the live picture with a dark shade around a card-shaped
 outline (63:88, a rounded rectangle in the middle, `CardFrame.rect` in `wwwroot/js/card-frame.js`).
@@ -625,6 +630,28 @@ Settings: `Check:Model` (default `qwen3-vl:8b`; the first image-reading model th
 limit `RateLimit:ScanPerMinute` (12 per logged-in user a minute). The card prompt is a copy of the one in `ProtoUpload.cshtml.cs`:
 change both together (ProtoUpload could be made to use `CardChecker` later).
 
+### Album page
+
+`/Album` (`Pages/Album.cshtml(.cs)`, styles at the end of `home.css`), for logged-in users; the saved cards icon in the header opens it.
+It shows the user's **default album** (always the default for now; `?album=<id>` is ready for "choose an album" and gives 404 for an album
+that is not the user's). The header has the language flags on the left (like the front page and Start), the album's name ("My cards" / "Mine kort") and a back arrow to Start on the right (the Check page's header is the same, with the saved cards icon before the back arrow).
+
+- **Thumbnails.** The cards as small pictures with their name under each, newest added first. The picture is TCGdex's small size
+  (the stored `.../high.webp` address is read as `.../low.webp`), loaded lazily. The grid fits as many 100 px-wide thumbnails as there
+  is room for: three on a normal phone, never fewer than two, seven or more on desktop. Long names are cut after two lines; a card
+  without a picture address gets a dashed "?" box.
+- **Version icon.** Each thumbnail has a small icon in its bottom-right corner showing which version the user said they have: normal,
+  holofoil or reverse holofoil (the same icons as in the "which version" choice, `_FinishSprite`), with the name as tooltip and screen
+  reader text. Cards saved before the version was chosen (finish unknown) have no icon.
+- **Empty slots.** The last row is filled up with empty, dashed card slots (`wwwroot/js/album.js`), so an album with few cards does not look
+  bare. The script reads the real number of columns, which depends on the screen, and redoes the slots when the window changes size.
+- **Paging.** `Album:PageSize` cards per page (50 by default, kept between 1 and 200); `?p=2` is the page. Below the cards: Previous, the
+  first, last and nearby page numbers, Next. A page number that is too high goes to the last page, a bad one to page 1.
+- **Empty.** Without cards it says so and offers "Check a card". Looking never creates an album: the default album is created when the
+  first card is added.
+- **Not yet:** the cards are not clickable. Showing a card's details comes later.
+- Reading is `AlbumService.GetPageAsync`: it fetches only id, name and picture address, so the price data is not loaded for a list.
+
 ## Project layout
 
 ```
@@ -634,6 +661,7 @@ Pages/
   SetLanguage.cshtml(.cs)    Where the language flags post to
   Start.cshtml(.cs)          The page after login: Check a card / Fair swap? (login required)
   Check.cshtml(.cs)          Check a card: take or upload a photo, see the card and price (login required)
+  Album.cshtml(.cs)          The album: card thumbnails with names, paged (login required)
   ProtoUpload.cshtml(.cs)    Card recognition test page (login required)
   Shared/_Layout.cshtml      HTML shell (language attribute, optional Head section)
   Shared/_LayoutHome.cshtml  The cheerful look used by the front page and the account pages

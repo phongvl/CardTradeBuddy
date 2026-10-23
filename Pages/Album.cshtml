@@ -1,0 +1,101 @@
+@page
+@model CardTradeBuddy.Pages.AlbumModel
+@using CardTradeBuddy.Services
+@{
+    Layout = "_LayoutHome";
+    ViewData["Title"] = Model.Title;
+}
+
+<main class="check-page album-page">
+    <header class="check-header">
+        <partial name="_LanguageSwitch" />
+        <h1 class="check-title">@Model.Title</h1>
+        <a class="check-back" asp-page="/Start" aria-label="@T["BackToStart"]">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 L7.5 12 L14.5 19" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        </a>
+    </header>
+
+    <section class="album-panel" aria-label="@Model.Title">
+        @if (Model.TotalCards == 0)
+        {
+            <div class="album-empty">
+                <p><strong>@T["AlbumEmpty"]</strong><br />@T["AlbumEmptyHint"]</p>
+                <a class="btn btn-primary" asp-page="/Check">@T["StartCheckTitle"]</a>
+            </div>
+        }
+        else
+        {
+            <p class="album-count">@(Model.TotalCards == 1 ? T["AlbumCountOne"].Value : T["AlbumCountMany", Model.TotalCards].Value)</p>
+
+            <partial name="_FinishSprite" />
+
+            @* The cards are not links yet: showing a card's details comes later. The small icon in the corner is the version of the card. *@
+            <ul class="album-grid">
+                @foreach (var card in Model.Cards)
+                {
+                    <li class="album-card">
+                        <span class="album-pic">
+                            @if (AlbumModel.ThumbnailUrl(card.ImageUrl) is { } thumb)
+                            {
+                                <img class="album-thumb" src="@thumb" alt="" width="63" height="88" loading="lazy" decoding="async" />
+                            }
+                            else
+                            {
+                                <span class="album-thumb no-image" aria-hidden="true">?</span>
+                            }
+                            @if (card.Finish is CardFinish.Normal or CardFinish.Holofoil or CardFinish.ReverseHolofoil)
+                            {
+                                var finishName = Model.FinishName(card.Finish);
+                                <span class="album-finish" role="img" aria-label="@finishName" title="@finishName">
+                                    <svg viewBox="0 0 30 42" aria-hidden="true"><use href="#finish-@card.Finish.ToString().ToLowerInvariant()" /></svg>
+                                </span>
+                            }
+                        </span>
+                        <span class="album-name">@card.Name</span>
+                    </li>
+                }
+            </ul>
+
+            @if (Model.TotalPages > 1)
+            {
+                <nav class="album-pages" aria-label="@T["AlbumPageLabel"]">
+                    @if (Model.PageNumber > 1)
+                    {
+                        <a asp-page="/Album" asp-route-p="@(Model.PageNumber - 1)" asp-route-album="@Model.AlbumId" rel="prev">@T["AlbumPrev"]</a>
+                    }
+                    else
+                    {
+                        <span class="is-disabled" aria-disabled="true">@T["AlbumPrev"]</span>
+                    }
+
+                    @foreach (var n in Model.PageLinks)
+                    {
+                        if (n is null)
+                        {
+                            <span class="gap" aria-hidden="true">&hellip;</span>
+                        }
+                        else if (n == Model.PageNumber)
+                        {
+                            <span class="is-current" aria-current="page" aria-label="@T["AlbumPageN", n]">@n</span>
+                        }
+                        else
+                        {
+                            <a asp-page="/Album" asp-route-p="@n" asp-route-album="@Model.AlbumId" aria-label="@T["AlbumPageN", n]">@n</a>
+                        }
+                    }
+
+                    @if (Model.PageNumber < Model.TotalPages)
+                    {
+                        <a asp-page="/Album" asp-route-p="@(Model.PageNumber + 1)" asp-route-album="@Model.AlbumId" rel="next">@T["AlbumNext"]</a>
+                    }
+                    else
+                    {
+                        <span class="is-disabled" aria-disabled="true">@T["AlbumNext"]</span>
+                    }
+                </nav>
+            }
+        }
+    </section>
+</main>
+
+<script src="~/js/album.js" asp-append-version="true" defer></script>

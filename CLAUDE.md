@@ -69,14 +69,15 @@ Scripts/deploy.ps1  IIS deploy; wwwroot/css/home.css  all front page styles; www
 - **Start page** (`/Start`, `LoginForm.HomePath`): where login ends. Two halves: Check a card (links to `/Check`) and Fair swap?
   ("Coming soon", no page yet). Pictures are inline SVG partials; phone must fit both halves on one screen. `/ProtoUpload` is the old
   developer test page: keep it as it is.
-- **Saved cards icon** in the header of Start and Check (`_SavedCardsIcon`, logged-in only): icon only, no page behind it yet.
+- **Saved cards icon** in the header of Start and Check (`_SavedCardsIcon`, logged-in only) opens `/Album`: the default album as small thumbnails with names,
+  paged (`Album:PageSize`, 50). Cards are not clickable yet (card details come later); no way to choose another album yet.
 - **Check page** (`/Check`): take/upload a photo (`wwwroot/js/check.js`: full-screen camera with a card outline that turns green
   when a card sits in it (`card-frame.js`) and crops to the outline; native camera app as a fallback on phones; drag and drop; shrink
   to 2400 px), preview, then `CardChecker` reads the card with Ollama + TCGdex and shows card and price (kroner when Danish).
   Its card prompt is a copy of ProtoUpload's: change both together. Rate limit `scan` per user.
 - **Albums and cards:** tables `albums` (one default album per user, created on first add; no way to make more yet) and `cards` (belongs to
   exactly one album; all card info incl. image URLs, `Pricing` jsonb, `EstimatedPriceEur`, `PricesCheckedAt`). `AlbumService` does it;
-  the Check page's "Add to my album" posts the signed result. The user's photo is never stored.
+  the Check page's "Add to my album" posts the signed result and the finish the user must choose (normal / holofoil / reverse holofoil, tiles with icons from `_FinishSprite`; the price saved is for that finish). The user's photo is never stored.
 - **Create user:** birthday required, minimum age `Account:MinimumAge` (13). Saved in `user_profiles` only for a brand-new account.
   Email confirmation is off by default (`Login:VerifyEmail`).
 - **Currency follows the language:** Danish page = kroner (`kr.`, converted for display with the EUR -> DKK rate), other languages = euros.

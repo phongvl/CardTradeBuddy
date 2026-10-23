@@ -35,6 +35,9 @@ public class CheckModel(CardChecker checker, AlbumService albums, IDataProtectio
     /// <summary>The name of the album the card was just added to (in the user's language); null before it is added.</summary>
     public string? AddedTo { get; private set; }
 
+    /// <summary>The version of the card that was just added, as a display name.</summary>
+    public string? AddedFinish { get; private set; }
+
     /// <summary>Why the photo could not be checked, in the user's language; null when there is nothing to say or the card was found.</summary>
     public string? Error { get; private set; }
 
@@ -64,7 +67,7 @@ public class CheckModel(CardChecker checker, AlbumService albums, IDataProtectio
     }
 
     /// <summary>"Add to album": puts the card that was found in the user's default album (created if they have none).</summary>
-    public async Task<IActionResult> OnPostAddAsync(string? token, Guid? albumId, CancellationToken cancellationToken)
+    public async Task<IActionResult> OnPostAddAsync(string? token, Guid? albumId, CardFinish? finish, CancellationToken cancellationToken)
     {
         if (UserPreferences.UserId(User) is not { } userId)
             return Challenge();
@@ -88,10 +91,18 @@ public class CheckModel(CardChecker checker, AlbumService albums, IDataProtectio
 
         Result = result;
         Token = token;
+
+        // The user must say which version of the card they have.
+        if (finish is not (CardFinish.Normal or CardFinish.Holofoil or CardFinish.ReverseHolofoil))
+        {
+            Error = localizer["FinishRequired"].Value;
+            return Page();
+        }
+
         try
         {
             // No album named: the default one. (Choosing an album is for later; the album id is already passed on.)
-            var added = await albums.AddCardAsync(userId, albumId, result, cancellationToken);
+            var added = await albums.AddCardAsync(userId, albumId, result, finish.Value, cancellationToken);
             if (added is null)
             {
                 Error = localizer["AlbumErrUnavailable"].Value;
@@ -99,6 +110,7 @@ public class CheckModel(CardChecker checker, AlbumService albums, IDataProtectio
             }
 
             AddedTo = added.Album.IsDefault ? localizer["DefaultAlbumName"].Value : added.Album.Name;
+            AddedFinish = FinishName(finish.Value);
         }
         catch (Exception ex) when (ex is Microsoft.EntityFrameworkCore.DbUpdateException or InvalidOperationException or Npgsql.NpgsqlException)
         {

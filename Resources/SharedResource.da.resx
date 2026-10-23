@@ -81,5 +81,54 @@
   <data name="StartArtCheck" xml:space="preserve"><value>To kort under et forstørrelsesglas, med sættet og prisen</value></data>
   <data name="StartArtSwap" xml:space="preserve"><value>To børn der ligger på et tæppe og bytter kort</value></data>
   <data name="StartTagPrice" xml:space="preserve"><value>24 kr.</value></data>
+  <data name="CheckHeading" xml:space="preserve"><value>Vis os dit kort</value></data>
+  <data name="CheckIntro" xml:space="preserve"><value>Tag et billede eller vælg et fra din enhed.</value></data>
+  <data name="CheckArtLabel" xml:space="preserve"><value>Et kort i et kamerasøger</value></data>
+  <data name="TakePhoto" xml:space="preserve"><value>Tag et billede</value></data>
+  <data name="UseCamera" xml:space="preserve"><value>Brug kamera</value></data>
+  <data name="UploadImage" xml:space="preserve"><value>Upload et billede</value></data>
+  <data name="DropHere" xml:space="preserve"><value>Slip et billede her</value></data>
+  <data name="OrChooseBelow" xml:space="preserve"><value>eller vælg nedenfor</value></data>
+  <data name="TipWhole" xml:space="preserve"><value>Hele kortet i billedet</value></data>
+  <data name="TipLight" xml:space="preserve"><value>Godt lys, ingen genskin</value></data>
+  <data name="TipNotSaved" xml:space="preserve"><value>Billeder bliver aldrig gemt</value></data>
+  <data name="BackToStart" xml:space="preserve"><value>Tilbage til start</value></data>
+  <data name="PreviewLabel" xml:space="preserve"><value>Dit billede</value></data>
+  <data name="CheckThisCard" xml:space="preserve"><value>Tjek dette kort</value></data>
+  <data name="ChooseAnother" xml:space="preserve"><value>Vælg et andet</value></data>
+  <data name="CheckAnother" xml:space="preserve"><value>Tjek et andet kort</value></data>
+  <data name="CheckLooking" xml:space="preserve"><value>Finder kortet...</value></data>
+  <data name="CheckNeedsScript" xml:space="preserve"><value>Siden kræver JavaScript for at vælge et billede.</value></data>
+  <data name="CameraTake" xml:space="preserve"><value>Tag billede</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Annuller</value></data>
+  <data name="CameraDenied" xml:space="preserve"><value>Vi kunne ikke åbne kameraet. Vælg i stedet et billede.</value></data>
+  <data name="CheckErrBadImage" xml:space="preserve"><value>Vi kunne ikke læse filen. Brug et foto (JPEG eller PNG) under {0} MB.</value></data>
+  <data name="CheckErrNotCard" xml:space="preserve"><value>Det ligner ikke et Pokémon-kort.</value></data>
+  <data name="CheckErrUpsideDown" xml:space="preserve"><value>Vi kunne ikke læse kortet. Prøv et billede, hvor kortet vender rigtigt.</value></data>
+  <data name="CheckErrUnreadable" xml:space="preserve"><value>Det ligner et Pokémon-kort, men vi kunne ikke læse navn eller nummer. Prøv et billede tættere på.</value></data>
+  <data name="CheckErrNotFound" xml:space="preserve"><value>Vi læste &quot;{0}&quot;, men kunne ikke finde kortet i vores liste.</value></data>
+  <data name="CheckErrUnavailable" xml:space="preserve"><value>Kortlæseren er ikke tilgængelig lige nu. Prøv igen om lidt.</value></data>
+  <data name="ResSet" xml:space="preserve"><value>Sæt</value></data>
+  <data name="ResNumber" xml:space="preserve"><value>Nummer</value></data>
+  <data name="ResRarity" xml:space="preserve"><value>Sjældenhed</value></data>
+  <data name="ResPrice" xml:space="preserve"><value>Anslået pris</value></data>
+  <data name="ResAllFinishes" xml:space="preserve"><value>Pris pr. udgave</value></data>
+  <data name="ResFinishNormal" xml:space="preserve"><value>Normal</value></data>
+  <data name="ResFinishHolo" xml:space="preserve"><value>Holofoil</value></data>
+  <data name="ResFinishReverse" xml:space="preserve"><value>Reverse holofoil</value></data>
+  <data name="ResAssumed" xml:space="preserve"><value>Vi kunne ikke se udgaven på billedet, så prisen gælder {0}-udgaven.</value></data>
+  <data name="ResDisagree" xml:space="preserve"><value>Butikkerne er for uenige om dette kort til at give én pris.</value></data>
+  <data name="ResNoPrice" xml:space="preserve"><value>Der er ingen pris for dette kort.</value></data>
+  <data name="ResNote" xml:space="preserve"><value>Et skøn ud fra priser fra Cardmarket og TCGplayer til dagens kurser.</value></data>
+  <data name="CameraHint" xml:space="preserve"><value>Placér hele kortet i rammen</value></data>
+  <data name="CameraReady" xml:space="preserve"><value>Det ser godt ud. Tag billedet nu</value></data>
+  <data name="CameraCloser" xml:space="preserve"><value>Kom lidt tættere på</value></data>
+  <data name="CameraFurther" xml:space="preserve"><value>Gå lidt længere væk</value></data>
+  <data name="SavedCards" xml:space="preserve"><value>Gemte kort</value></data>
+  <data name="AddToAlbum" xml:space="preserve"><value>Føj til mit album</value></data>
+  <data name="AddedToAlbum" xml:space="preserve"><value>Tilføjet til {0}.</value></data>
+  <data name="DefaultAlbumName" xml:space="preserve"><value>Mine kort</value></data>
+  <data name="AlbumErrUnavailable" xml:space="preserve"><value>Vi kunne ikke gemme kortet lige nu. Prøv igen om lidt.</value></data>
+  <data name="CheckErrExpired" xml:space="preserve"><value>Dette resultat er for gammelt til at blive tilføjet. Tjek kortet igen.</value></data>
 </root>
 

@@ -19,6 +19,7 @@ builder.Services.AddRazorPages(options =>
     // The card scanner uses the GPU and the price services, so it is only for logged-in users. The Start page is where login ends.
     options.Conventions.AuthorizePage("/ProtoUpload");
     options.Conventions.AuthorizePage("/Start");
+    options.Conventions.AuthorizePage("/Check");
 }).AddViewLocalization();
 
 // Login: this app has its own login page and checks passwords with the LoginServer (server to server).
@@ -43,6 +44,8 @@ builder.Services.AddHttpClient<TurnstileVerifier>(client =>
     client.Timeout = TimeSpan.FromSeconds(10);
 });
 builder.Services.AddScoped<FormChecks>();
+builder.Services.AddScoped<CardChecker>();
+builder.Services.AddScoped<AlbumService>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -67,12 +70,18 @@ builder.Services.AddAntiforgery(options =>
 // Slows down password guessing, sign-up spam and reset-mail flooding per visitor: at most RateLimit:AuthPerMinute requests a minute to the
 // login and account pages from one address, 10 by default. (The LoginServer also locks an account after repeated failures.)
 var authRequestsPerMinute = builder.Configuration.GetValue("RateLimit:AuthPerMinute", 10);
+var scanRequestsPerMinute = builder.Configuration.GetValue("RateLimit:ScanPerMinute", 12);
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
     options.AddPolicy("auth", context => RateLimitPartition.GetFixedWindowLimiter(
         ClientIp.Get(context) ?? "unknown",
         _ => new FixedWindowRateLimiterOptions { PermitLimit = authRequestsPerMinute, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
+
+    // The card check uses the GPU: per logged-in user, RateLimit:ScanPerMinute requests a minute (page loads and photos), 12 by default.
+    options.AddPolicy("scan", context => RateLimitPartition.GetFixedWindowLimiter(
+        context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? ClientIp.Get(context) ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = scanRequestsPerMinute, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
 });
 builder.Services.AddHttpClient<ILlmService, OllamaLlmService>(client =>
 {

@@ -516,6 +516,37 @@ body.home {
     font-size: 20px;
     font-weight: 800;
     line-height: 1.2;
+    white-space: nowrap;
+}
+
+/* Narrow phones: flags, name, saved cards icon and Log out all share one row, so the name gives a little. */
+@media (max-width: 420px) {
+    .start-header {
+        gap: 6px;
+        padding: 6px 10px 4px;
+    }
+
+    .start-header .lang {
+        width: 38px;
+        height: 38px;
+    }
+
+    .start-brand {
+        font-size: 15px;
+        letter-spacing: -0.2px;
+    }
+
+    .btn-logout {
+        padding: 0 10px;
+        font-size: 13px;
+    }
+}
+
+/* Very small phones: no room for the name, the "signed in as" line stays. */
+@media (max-width: 350px) {
+    .start-brand {
+        display: none;
+    }
 }
 
 .start-user {
@@ -730,4 +761,726 @@ body.home {
     .mode {
         transition: none;
     }
+}
+
+/* ---- Check a card page (see Pages/Check.cshtml) ---- */
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.check-page [hidden] {
+    display: none !important;
+}
+
+.check-page {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    max-width: 1120px;
+    margin: 0 auto;
+}
+
+.check-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px 4px;
+}
+
+/* The flags sit in the header here, not pinned to the corner of the window. */
+.check-header .lang-switch {
+    position: static;
+    margin: 0 -8px 0 0;
+}
+
+.check-back {
+    width: 44px;
+    height: 44px;
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    border: 2px solid var(--blue);
+    border-radius: 50%;
+    background: #fff;
+    color: var(--blue-dark);
+}
+
+.check-back svg {
+    width: 22px;
+    height: 22px;
+}
+
+.check-title {
+    flex: 1;
+    margin: 0;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.check-stage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 4px 10px 12px;
+}
+
+.check-panel {
+    position: relative;
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    box-sizing: border-box;
+    padding: 10px 18px 20px;
+    border-radius: 24px;
+    background: #cfe3ff;
+    color: #12306b;
+}
+
+/* The big soft circle behind the picture, like on the Start page. */
+.check-panel::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 120%;
+    aspect-ratio: 1;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: #9cc2ff;
+}
+
+.check-intro {
+    position: relative;
+    text-align: center;
+}
+
+.check-art {
+    display: block;
+    width: min(100%, 230px);
+    height: auto;
+    max-height: max(110px, calc(40dvh - 90px));
+    margin: 0 auto;
+}
+
+.check-panel.is-previewing .check-intro {
+    display: none;
+}
+
+.check-heading {
+    margin: 4px 0;
+    font-size: 22px;
+    line-height: 1.2;
+}
+
+.check-lead {
+    margin: 0 0 14px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.check-actions {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+}
+
+.check-choose {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.dropzone {
+    display: none;
+}
+
+.check-actions .btn {
+    min-height: 48px;
+    gap: 10px;
+    border-radius: 14px;
+    font-size: 16px;
+}
+
+.check-actions .btn svg {
+    width: 22px;
+    height: 22px;
+    flex: none;
+}
+
+.btn-camera {
+    --btn-bg: var(--blue);
+    border: 2px solid var(--blue);
+    background: var(--btn-bg);
+    color: #fff;
+}
+
+.btn-upload {
+    --btn-bg: #fff;
+    border: 2px solid var(--blue);
+    background: var(--btn-bg);
+    color: var(--blue);
+}
+
+.label-desktop {
+    display: none;
+}
+
+.check-tips {
+    display: grid;
+    gap: 6px;
+    margin: 6px 0 0;
+    padding: 10px 14px;
+    list-style: none;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.75);
+    font-size: 13px;
+}
+
+.check-tips li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.check-tips li::before {
+    content: "\2713";
+    flex: none;
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #22c55e;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.check-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* The photo, and while the card is being found a scan that runs over it (a light bar with a glow, plus a faint blue tint). */
+.scan-frame {
+    position: relative;
+    display: block;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 14px;
+    background: #fff;
+}
+
+.scan-frame img {
+    display: block;
+    max-width: 100%;
+    max-height: 42dvh;
+    width: auto;
+    height: auto;
+}
+
+.scan-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 22%;
+    display: none;
+    background: linear-gradient(to bottom, rgba(59, 130, 246, 0) 0%, rgba(59, 130, 246, 0.35) 70%, rgba(147, 197, 253, 0.8) 100%);
+    border-bottom: 3px solid #fff;
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.8);
+    transform: translateY(-100%);
+}
+
+.check-preview.is-scanning .scan-frame::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(37, 99, 235, 0.12);
+}
+
+.check-preview.is-scanning .scan-line {
+    display: block;
+    animation: check-scan 1.7s ease-in-out infinite alternate;
+}
+
+/* Only the picture stays; the buttons make room for the text below it. */
+.check-preview.is-scanning .btn {
+    display: none;
+}
+
+@keyframes check-scan {
+    from {
+        transform: translateY(-100%);
+    }
+
+    to {
+        transform: translateY(455%);
+    }
+}
+
+.check-wait {
+    margin: 20px 0;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* The camera screen: full screen, black, the picture with the card outline on top. */
+
+body.camera-open {
+    overflow: hidden;
+}
+
+.camera {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #000;
+    color: #fff;
+}
+
+.camera[hidden] {
+    display: none;
+}
+
+.camera-stage {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+}
+
+/* The video (object-fit: contain) and the overlay (an SVG whose viewBox is the picture's own size, drawn with "meet") fit the
+   same box in the same way, so the outline always lines up with the picture. */
+.camera-stage video,
+.camera-overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.camera-stage video {
+    object-fit: contain;
+    background: #000;
+}
+
+.camera-overlay {
+    pointer-events: none;
+    --line: 3px;
+}
+
+.camera-overlay .shade {
+    fill: rgba(0, 0, 0, 0.55);
+}
+
+.camera-overlay .frame {
+    fill: none;
+    stroke: #fff;
+    stroke-width: var(--line);
+    stroke-dasharray: none;
+}
+
+.camera-overlay .fill {
+    fill: rgba(34, 197, 94, 0);
+    transition: fill 0.2s ease;
+}
+
+.camera-overlay.ok .fill {
+    fill: rgba(34, 197, 94, 0.32);
+}
+
+.camera-overlay.ok .frame {
+    stroke: #22c55e;
+}
+
+.camera-hint {
+    margin: 0;
+    padding: 10px 16px 4px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.camera-bar {
+    width: 100%;
+    max-width: 420px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 24px calc(18px + env(safe-area-inset-bottom, 0px));
+}
+
+.camera-cancel,
+.camera-spacer {
+    width: 48px;
+    height: 48px;
+}
+
+.camera-cancel {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.18);
+    color: #fff;
+    cursor: pointer;
+}
+
+.camera-cancel svg {
+    width: 24px;
+    height: 24px;
+}
+
+.camera-shutter {
+    width: 72px;
+    height: 72px;
+    padding: 0;
+    border: 5px solid #fff;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: inset 0 0 0 4px #000;
+    cursor: pointer;
+}
+
+.camera-shutter:active {
+    background: #d1d5db;
+}
+
+/* The answer */
+
+.check-result {
+    align-items: stretch;
+}
+
+.result-image {
+    position: relative;
+    display: block;
+    width: min(60%, 240px);
+    height: auto;
+    margin: 6px auto 12px;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(31, 42, 68, 0.25);
+}
+
+.result-body {
+    position: relative;
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+.result-body h2 {
+    margin: 0 0 8px;
+    font-size: 24px;
+    line-height: 1.2;
+    text-align: center;
+}
+
+.result-facts {
+    display: grid;
+    gap: 4px;
+    margin: 0 0 10px;
+    font-size: 14px;
+}
+
+.result-facts div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.result-facts dt {
+    font-weight: 600;
+}
+
+.result-facts dd {
+    margin: 0;
+    text-align: right;
+}
+
+.result-price-label {
+    margin: 10px 0 0;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.result-price {
+    margin: 0;
+    font-size: 34px;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.result-note {
+    margin: 6px 0;
+    font-size: 12.5px;
+    line-height: 1.4;
+    opacity: 0.85;
+}
+
+.result-finishes {
+    display: grid;
+    gap: 4px;
+    margin: 4px 0 8px;
+    padding: 10px 14px;
+    list-style: none;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.75);
+    font-size: 14px;
+}
+
+.result-finishes li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.result-buttons {
+    display: grid;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.result-buttons .btn {
+    min-height: 48px;
+    border-radius: 14px;
+    font-size: 16px;
+}
+
+@media (min-width: 560px) {
+    .check-stage {
+        max-width: 640px;
+        margin: 0 auto;
+    }
+}
+
+@media (min-width: 900px) {
+    .check-header {
+        padding: 10px 24px 6px;
+    }
+
+    .check-title {
+        font-size: 26px;
+    }
+
+    .check-stage {
+        max-width: none;
+        justify-content: center;
+        padding: 6px 24px 24px;
+    }
+
+    .check-panel {
+        flex: none;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 48px;
+        width: 100%;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 40px;
+    }
+
+    .check-panel::before {
+        top: -10%;
+        width: 70%;
+        left: 30%;
+    }
+
+    .check-intro,
+    .check-panel.is-previewing .check-intro {
+        display: block;
+        flex: 1;
+        text-align: left;
+    }
+
+    .check-art {
+        width: 100%;
+        max-width: 320px;
+        max-height: none;
+        margin: 0 0 8px;
+    }
+
+    .check-heading {
+        font-size: 32px;
+    }
+
+    .check-lead {
+        margin: 0;
+        font-size: 17px;
+    }
+
+    /* The right side becomes its own white panel with the drop box. */
+    .check-actions {
+        flex: none;
+        width: 340px;
+        padding: 14px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.85);
+    }
+
+    .dropzone {
+        order: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        min-height: 130px;
+        box-sizing: border-box;
+        padding: 14px;
+        border: 2px dashed var(--blue);
+        border-radius: 14px;
+        text-align: center;
+        font-size: 14px;
+        color: #12306b;
+    }
+
+    .dropzone svg {
+        width: 34px;
+        height: 34px;
+        color: var(--blue);
+    }
+
+    .dropzone span {
+        font-size: 13px;
+    }
+
+    .dropzone.is-over {
+        background: #eff4ff;
+        border-style: solid;
+    }
+
+    .label-phone {
+        display: none;
+    }
+
+    .label-desktop {
+        display: inline;
+    }
+
+    .btn-upload {
+        --btn-bg: var(--blue);
+        order: 1;
+        color: #fff;
+    }
+
+    .btn-camera {
+        --btn-bg: #fff;
+        order: 2;
+        color: var(--blue);
+    }
+
+    .check-tips {
+        order: 3;
+        margin-top: 2px;
+        padding: 6px 4px 0;
+        background: transparent;
+    }
+
+    .check-result {
+        align-items: center;
+        gap: 56px;
+    }
+
+    .result-image {
+        flex: none;
+        width: 260px;
+        margin: 0;
+    }
+
+    .result-body {
+        flex: 1;
+        margin: 0;
+    }
+
+    .result-body h2 {
+        font-size: 32px;
+        text-align: left;
+    }
+
+    .result-price {
+        font-size: 42px;
+    }
+
+    .result-buttons {
+        grid-auto-flow: column;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .check-preview.is-scanning .scan-line {
+        animation: none;
+        transform: translateY(160%);
+    }
+}
+
+/* ---- The "saved cards" icon in the header of the logged-in pages (see Pages/Shared/_SavedCardsIcon.cshtml) ---- */
+
+.saved-icon {
+    width: 44px;
+    height: 44px;
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    border: 2px solid var(--blue);
+    border-radius: 50%;
+    background: #fff;
+    color: var(--blue-dark);
+}
+
+.saved-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* "Add to album" under the answer */
+
+.result-add {
+    margin: 14px 0 0;
+}
+
+.result-add .btn {
+    min-height: 48px;
+    border-radius: 14px;
+    font-size: 16px;
+}
+
+.result-add + .result-buttons {
+    margin-top: 10px;
+}
+
+.result-body .message {
+    margin: 12px 0 0;
 }

@@ -14,6 +14,8 @@
             <span class="start-user">@T["SignedInAs", User.Identity?.Name ?? ""]</span>
         </div>
 
+        <partial name="_SavedCardsIcon" />
+
         <form method="post" asp-page="/Account/Logout" class="start-logout">
             <button type="submit" class="btn-logout">@T["LogOut"]</button>
         </form>
@@ -21,7 +23,7 @@
 
     @* The two modes. Phone: stacked. Wide screens: side by side, the one under the pointer grows a little. *@
     <div class="start-modes">
-        <a class="mode mode-check" asp-page="/ProtoUpload">
+        <a class="mode mode-check" asp-page="/Check">
             <partial name="_StartArtCheck" />
             <span class="mode-text">
                 <h2>@T["StartCheckTitle"]</h2>

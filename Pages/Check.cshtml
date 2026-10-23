@@ -1,0 +1,181 @@
+@page
+@model CardTradeBuddy.Pages.CheckModel
+@using CardTradeBuddy.Services
+@{
+    Layout = "_LayoutHome";
+    ViewData["Title"] = T["StartCheckTitle"].Value;
+}
+
+<main class="check-page">
+    <header class="check-header">
+        <a class="check-back" asp-page="/Start" aria-label="@T["BackToStart"]">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 L7.5 12 L14.5 19" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        </a>
+        <h1 class="check-title">@T["StartCheckTitle"]</h1>
+        <partial name="_SavedCardsIcon" />
+        <partial name="_LanguageSwitch" />
+    </header>
+
+    @if (Model.Result is { Card: { } card } result)
+    {
+        @* ---- The answer ---- *@
+        <section class="check-stage" aria-labelledby="result-name">
+            <div class="check-panel check-result">
+                @if (card.ImageUrl is not null)
+                {
+                    <img class="result-image" src="@card.ImageUrl" alt="@card.Name" />
+                }
+                <div class="result-body">
+                    <h2 id="result-name">@card.Name</h2>
+                    <dl class="result-facts">
+                        <div><dt>@T["ResSet"]</dt><dd>@card.SetName</dd></div>
+                        <div><dt>@T["ResNumber"]</dt><dd>@card.LocalId@(card.SetOfficialCardCount is { } total ? $"/{total}" : "")</dd></div>
+                        <div><dt>@T["ResRarity"]</dt><dd>@(card.Rarity ?? "-")</dd></div>
+                    </dl>
+
+                    @if (result.Price?.AverageEur is { } price)
+                    {
+                        <p class="result-price-label">@T["ResPrice"] (@Model.FinishName(result.Price.Finish))</p>
+                        <p class="result-price">@Model.Money(price)</p>
+                        @if (result.Price.FinishAssumed)
+                        {
+                            <p class="result-note">@T["ResAssumed", Model.FinishName(result.Price.Finish)]</p>
+                        }
+                    }
+                    else if (result.Price?.PricesDisagree == true)
+                    {
+                        <p class="result-note">@T["ResDisagree"]</p>
+                    }
+                    else
+                    {
+                        <p class="result-note">@T["ResNoPrice"]</p>
+                    }
+
+                    @if (result.Prices is { } rows && rows.Count(r => r.AverageEur is not null) > 1)
+                    {
+                        <p class="result-price-label">@T["ResAllFinishes"]</p>
+                        <ul class="result-finishes">
+                            @foreach (var row in rows.Where(r => r.AverageEur is not null))
+                            {
+                                <li><span>@Model.FinishName(row.Finish)</span><strong>@Model.Money(row.AverageEur!.Value)</strong></li>
+                            }
+                        </ul>
+                    }
+
+                    <p class="result-note">@T["ResNote"]</p>
+
+                    @if (Model.AddedTo is not null)
+                    {
+                        <p class="message notice" role="status">@T["AddedToAlbum", Model.AddedTo]</p>
+                    }
+                    else if (Model.Token is not null)
+                    {
+                        @if (Model.Error is not null)
+                        {
+                            <p class="message error" role="alert">@Model.Error</p>
+                        }
+                        <form method="post" asp-page-handler="Add" class="result-add">
+                            <input type="hidden" name="token" value="@Model.Token" />
+                            <button type="submit" class="btn btn-primary">@T["AddToAlbum"]</button>
+                        </form>
+                    }
+
+                    <div class="result-buttons">
+                        <a class="btn @(Model.AddedTo is not null ? "btn-primary" : "btn-secondary")" asp-page="/Check">@T["CheckAnother"]</a>
+                        <a class="btn btn-secondary" asp-page="/Start">@T["BackToStart"]</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+    else
+    {
+        @* ---- Choose a photo (and the preview of the chosen one) ---- *@
+        <section class="check-stage" aria-labelledby="check-heading">
+            <div class="check-panel">
+                <div class="check-intro">
+                    <partial name="_CheckArt" />
+                    <h2 id="check-heading" class="check-heading">@T["CheckHeading"]</h2>
+                    <p class="check-lead">@T["CheckIntro"]</p>
+                </div>
+
+                <form method="post" enctype="multipart/form-data" id="check-form" class="check-actions" novalidate
+                      data-camera-denied="@T["CameraDenied"]">
+                    @if (Model.Error is not null)
+                    {
+                        <p class="message error" role="alert">@Model.Error</p>
+                    }
+
+                    @* The one field that is posted; the script fills it with the photo from any of the ways below. *@
+                    <input type="file" name="Photo" id="photo" class="visually-hidden" accept="image/*" tabindex="-1" />
+
+                    <div id="choose" class="check-choose">
+                        <div class="dropzone" id="dropzone">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16 V4 M7 9 L12 4 L17 9 M4 15 V20 H20 V15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                            <strong>@T["DropHere"]</strong>
+                            <span>@T["OrChooseBelow"]</span>
+                        </div>
+
+                        <button type="button" class="btn btn-camera" id="btn-camera">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8 H8 L9.5 5.5 H14.5 L16 8 H20 V19 H4 Z" fill="currentColor" /><circle cx="12" cy="13" r="3.2" fill="var(--btn-bg)" /></svg>
+                            <span class="label-phone">@T["TakePhoto"]</span><span class="label-desktop">@T["UseCamera"]</span>
+                        </button>
+                        <button type="button" class="btn btn-upload" id="btn-upload">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16 V4 M7 9 L12 4 L17 9 M4 15 V20 H20 V15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                            <span>@T["UploadImage"]</span>
+                        </button>
+
+                        <ul class="check-tips">
+                            <li>@T["TipWhole"]</li>
+                            <li>@T["TipLight"]</li>
+                            <li>@T["TipNotSaved"]</li>
+                        </ul>
+                    </div>
+
+                    <div id="preview" class="check-preview" hidden>
+                        <div class="scan-frame">
+                            <img id="preview-img" alt="@T["PreviewLabel"]" />
+                            <span class="scan-line" aria-hidden="true"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="btn-check">@T["CheckThisCard"]</button>
+                        <button type="button" class="btn btn-secondary" id="btn-again">@T["ChooseAnother"]</button>
+                    </div>
+
+                    <p class="check-wait" id="check-wait" role="status" hidden>@T["CheckLooking"]</p>
+
+                    <noscript>
+                        <p class="message error">@T["CheckNeedsScript"]</p>
+                    </noscript>
+                </form>
+
+                @* The two ways of picking a file. They have no name, so they are never posted themselves; the script copies the file into #photo. *@
+                <input type="file" id="pick-file" accept="image/*" hidden />
+                <input type="file" id="pick-camera" accept="image/*" capture="environment" hidden />
+            </div>
+
+            @* The camera screen: live picture, a card-shaped outline (green when the card sits in it) and a shutter button. *@
+            <div id="camera" class="camera" role="dialog" aria-modal="true" aria-label="@T["TakePhoto"]" hidden>
+                <div id="camera-stage" class="camera-stage">
+                    <video id="camera-video" autoplay playsinline muted></video>
+                    <svg id="camera-overlay" class="camera-overlay" aria-hidden="true">
+                        <path id="camera-shade" class="shade" fill-rule="evenodd" />
+                        <path id="camera-fill" class="fill" />
+                        <path id="camera-frame" class="frame" />
+                    </svg>
+                </div>
+                <p id="camera-hint" class="camera-hint" role="status"
+                   data-hint="@T["CameraHint"]" data-ready="@T["CameraReady"]" data-closer="@T["CameraCloser"]" data-further="@T["CameraFurther"]"></p>
+                <div class="camera-bar">
+                    <button type="button" id="camera-cancel" class="camera-cancel" aria-label="@T["Cancel"]">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6 L18 18 M18 6 L6 18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" /></svg>
+                    </button>
+                    <button type="button" id="camera-shoot" class="camera-shutter" aria-label="@T["CameraTake"]"></button>
+                    <span class="camera-spacer" aria-hidden="true"></span>
+                </div>
+            </div>
+        </section>
+    }
+</main>
+
+<script src="~/js/card-frame.js" asp-append-version="true" defer></script>
+<script src="~/js/check.js" asp-append-version="true" defer></script>

@@ -32,7 +32,8 @@ ASP.NET Core Razor Pages on .NET 10. Hosted on Windows with IIS.
 | Part | State |
 | --- | --- |
 | Front page (`/`) and account pages | Working: log in, create user, forgot password, reset password, confirm email and log out, all through the LoginServer (see [Login](#login-loginserver)), plus the language flags. |
-| Start page (`/Start`) | Working, for logged-in users only; where login ends. Two big halves: **Check a card** (opens `/ProtoUpload`) and **Fair swap?** (shown as "Coming soon": there is no page behind it yet). See [Start page](#start-page). |
+| Start page (`/Start`) | Working, for logged-in users only; where login ends. Two big halves: **Check a card** (opens `/Check`) and **Fair swap?** (shown as "Coming soon": there is no page behind it yet). See [Start page](#start-page). |
+| Check a card page (`/Check`) | Working, for logged-in users only. Take a photo or upload one, see the card, set, rarity and the estimated price. See [Check a card page](#check-a-card-page). |
 | Test page (`/ProtoUpload`) | Working, for logged-in users only. Upload a card photo, pick an Ollama model, see what was read, the card and its prices. Uploads are never saved to disk. |
 | `TradeEvaluator` | Working as a function. Not connected to any page yet. |
 | Storing trades or other per-user data | Not built. The app has no database of its own; users live in the LoginServer. |
@@ -72,6 +73,8 @@ dotnet run
 | `Turnstile:SecretKey` | (none) | Turnstile's private key, used to check the visitor's answer with Cloudflare. **Never in the repo**, like the other secrets. |
 | `Network:BehindCloudflare` | `false` | `true`: trust Cloudflare's `CF-Connecting-IP` header as the visitor's address (for the rate limit). Only set it if the site really is behind Cloudflare. |
 | `RateLimit:AuthPerMinute` | `10` | Requests per minute from one address to the login and account pages. |
+| `RateLimit:ScanPerMinute` | `12` | Requests per minute from one logged-in user to the Check a card page. |
+| `Check:Model` | `qwen3-vl:8b` | The Ollama model the Check page uses to read cards. |
 
 Settings that must not be in the repo live outside it. In development: the git-ignored `appsettings.Development.local.json` in the project folder, for example `{ "Login": { "Authority": "https://localhost:5001", "ClientSecret": "..." } }` (`dotnet user-secrets` works too). On the server: `appsettings.Production.json` in the site folder, which `deploy.ps1` writes and never overwrites.
 
@@ -497,6 +500,34 @@ database only knows a user by the LoginServer user id (the `NameIdentifier` clai
 
 Users created before the birthday was asked for have no `user_profiles` row.
 
+| Table `albums` | Type | Meaning |
+| --- | --- | --- |
+| `Id` (primary key) | `uuid` | |
+| `UserId` | `varchar(64)` | The LoginServer user id of the owner (indexed). |
+| `Name` | `varchar(100)` | The default album is stored as "My cards" and shown as "My cards" / "Mine kort" (resource `DefaultAlbumName`). |
+| `IsDefault` | `boolean` | The album cards go to when none is chosen. A unique partial index (`IX_albums_UserId_default`) allows only one per user. |
+| `CreatedAt` | `timestamptz` | |
+
+| Table `cards` | Type | Meaning |
+| --- | --- | --- |
+| `Id` (primary key) | `uuid` | |
+| `AlbumId` | `uuid`, not null | The **one** album the card is in (foreign key to `albums`, deleting an album deletes its cards). |
+| `AddedAt` | `timestamptz` | |
+| `CardId`, `LocalId`, `Name`, `Category`, `Rarity`, `Illustrator`, `Description` | text | What TCGdex said about the card, for example `sv10-001`. |
+| `SetId`, `SetName`, `SetOfficialCardCount` | text, int | The set. |
+| `ImageUrl`, `SetLogoUrl` | text | Addresses of the card picture and the set logo on TCGdex's servers. The user's own photo is **never** stored. |
+| `Hp`, `Stage`, `Types` (`text[]`), `Retreat` | | Card facts. |
+| `Finish` | text | `Normal`, `Holofoil`, `ReverseHolofoil` or `Unknown`: the finish the price is for. |
+| `FinishAssumed` | `boolean` | True when the finish could not be seen on the photo and the price is for an assumed one. |
+| `EstimatedPriceEur` | `numeric(12,2)` | The calculated price in EUR for `Finish`, null when there was none. |
+| `Pricing` | `jsonb` | Every marketplace figure TCGdex had (Cardmarket EUR, TCGplayer USD), as received (`CardPricing`). |
+| `PricesCheckedAt` | `timestamptz` | **When the price was last looked up.** A later price refresh should update `Pricing`, `EstimatedPriceEur` and this. |
+
+Owning two copies of a card means two rows. A user has albums through `albums.UserId`; `cards` has no user column of its own.
+`Services/AlbumService.cs` creates the default album on first use (a race between two requests is handled by the unique index) and
+adds cards. Users cannot create more albums yet: `AddCardAsync(userId, albumId?, result)` already takes an album, so a later
+"choose an album" only has to pass the id.
+
 A new setting is a new column: add a property to `Data/UserPreference.cs`, then `dotnet ef migrations add <Name> -o Data/Migrations`
 (the tool is in `.config/dotnet-tools.json`; run `dotnet tool restore` once; add `--configuration Release` if the debugger has the
 Debug build locked).
@@ -532,7 +563,7 @@ The page after login (`Pages/Start.cshtml`, styles at the end of `home.css`). Th
 
 | Mode | Look | Goes to |
 | --- | --- | --- |
-| Check a card | Blue backdrop, two cards under a magnifying glass, tags for set and price (`Pages/Shared/_StartArtCheck.cshtml`) | `/ProtoUpload` |
+| Check a card | Blue backdrop, two cards under a magnifying glass, tags for set and price (`Pages/Shared/_StartArtCheck.cshtml`) | `/Check` |
 | Fair swap? | Orange backdrop, two kids lying on a rug trading cards (`_StartArtSwap.cshtml`) | Nothing yet: shown with a "Coming soon" badge and not a link. Make it an `<a asp-page="...">` like the other half when the page exists. |
 
 - **Phone (under 560 px):** the halves are stacked and both fit on one screen: the pictures give way before the text does
@@ -541,7 +572,58 @@ The page after login (`Pages/Start.cshtml`, styles at the end of `home.css`). Th
 - The pictures are inline SVGs, so there are no image files and they scale to any width. The texts are in the resource files
   (`StartCheckTitle`, `StartSwapText`, ...), English and Danish.
 - The language flags are the shared partial `_LanguageSwitch.cshtml` (also used by the hero on the login pages).
-- `/ProtoUpload` is unchanged and still reachable directly.
+- **Saved cards icon** (`Pages/Shared/_SavedCardsIcon.cshtml`): two stacked cards with a bookmark, in the header of the logged-in pages
+  (Start and Check), shown only when logged in. It is only an icon for now (a `<span>`, not a link): nothing is behind it yet. When the
+  page exists, make it an `<a asp-page="...">` with the same `saved-icon` class. Texts: `SavedCards` (en "Saved cards", da "Gemte kort").
+- `/ProtoUpload` (the developer test page with the model dropdown and raw data) is unchanged and still reachable directly.
+
+### Check a card page
+
+`/Check` (`Pages/Check.cshtml(.cs)`, script `wwwroot/js/check.js`, styles at the end of `home.css`). In the same style as the Start page:
+a blue panel with a viewfinder picture, **Take a photo** and **Upload an image** (phone), and on desktop a dashed drop box with
+**Upload an image** and **Use camera**.
+
+1. **Choose.** Take a photo, pick a file, or drag one into the box. The script shrinks big photos to 2400 px on the long side
+   (JPEG) before sending, and puts the file in the one posted field `Photo`. **Take a photo** opens the camera screen below.
+   Where the live camera cannot be used (no https, no camera, access refused) a phone opens its own camera app
+   (`<input capture="environment">`) and a computer opens the file picker.
+2. **Preview.** The chosen photo is shown with **Check this card** and **Choose another**.
+3. **Check.** The form posts to the same page. Meanwhile (a few seconds) the photo stays on the page with a scan animation (a light bar
+   sweeping up and down over it, with a faint blue tint), the buttons are hidden, and the text "Finding the card..." is shown below it.
+   `Services/CardChecker.cs` does the work (same steps as ProtoUpload: card detection and the compact image, one model call, an
+   upside-down retry, TCGdex lookup, price calculation). Photos are read in memory and never saved.
+4. **Answer.** The card image, name, set, number, rarity, the estimated price for the detected finish (in kroner on a Danish
+   page) and the price per finish. If the finish could not be seen, it says which version the price is for. A photo that cannot be
+   used (not an image, over 12 MB, not a Pokémon card, unreadable, not in the list, reader offline) gives a message and the choose
+   screen again.
+5. **Add to album.** Under the answer, **Add to my album** puts the card in the user's default album (created the first time). The
+   result travels in a signed, sealed hidden field (data protection, valid 30 minutes), so what is added cannot be changed from the
+   browser; a tampered or too old field gives "This result is too old to add". The same card added twice within 30 seconds (a double
+   press or a refresh) is saved once. After adding, the page says "Added to My cards" and "Check another card" becomes the main button.
+
+**The camera screen** (full screen, `getUserMedia`, back camera on phones): the live picture with a dark shade around a card-shaped
+outline (63:88, a rounded rectangle in the middle, `CardFrame.rect` in `wwwroot/js/card-frame.js`).
+
+- **Green layer.** Four times a second a small copy of the picture is checked (`CardFrame.analyze`). The card does not have to
+  match the outline exactly: it is accepted when its size is within 12% of the outline, its centre within 8%, and it is card shaped.
+  The card is found in two ways, and either is enough: (1) its four edges, searched within 12% of each side of the outline (the outer
+  edge on each line); (2) for flat, low-contrast surfaces such as a white desk where the border hardly shows, the extent of the busy
+  part of the picture (artwork and print). The inside must also be sharp (a blurred or out-of-focus picture stays white). After
+  three good looks in a row the outline turns green with a green layer and the hint says "Looks good. Take the picture now". If a
+  card is found but is the wrong size the hint says "Move a little closer" or "Move a little further away". A card turned more than
+  about 10 degrees stays white. It is a hint only: the shutter works at any time, and the server still reads the card. The thresholds
+  are the constants at the top of `card-frame.js`.
+- **Tuning on a real phone.** Open `/Check?camdebug=1`: the hint then also shows what the check measures, for example
+  `[0.47/0.77/0.95/0.62 detail 46 ok]` (how sure each edge is, top/right/bottom/left; the sharpness; and `ok`, `small`, `big`, `off`
+  or `-` for nothing found).
+- **Crop.** The shutter cuts the full-resolution camera picture to the outline plus a 3% margin before it goes on to the preview.
+- Close with the X or Escape. The outline lines up with the picture whatever the screen shape: the video uses `object-fit: contain`
+  and the overlay is an SVG whose `viewBox` is the picture's own pixel size.
+- The live camera needs https (localhost counts). Production is https.
+
+Settings: `Check:Model` (default `qwen3-vl:8b`; the first image-reading model that is installed is used if it is not), and the rate
+limit `RateLimit:ScanPerMinute` (12 per logged-in user a minute). The card prompt is a copy of the one in `ProtoUpload.cshtml.cs`:
+change both together (ProtoUpload could be made to use `CardChecker` later).
 
 ## Project layout
 
@@ -551,6 +633,7 @@ Pages/
   Account/                   Login, Register (with birthday), ForgotPassword, ResetPassword, VerifyEmail, Logout
   SetLanguage.cshtml(.cs)    Where the language flags post to
   Start.cshtml(.cs)          The page after login: Check a card / Fair swap? (login required)
+  Check.cshtml(.cs)          Check a card: take or upload a photo, see the card and price (login required)
   ProtoUpload.cshtml(.cs)    Card recognition test page (login required)
   Shared/_Layout.cshtml      HTML shell (language attribute, optional Head section)
   Shared/_LayoutHome.cshtml  The cheerful look used by the front page and the account pages
@@ -566,6 +649,7 @@ Services/
   ClientIp.cs, EmailAddress.cs, PasswordRules.cs, RememberedEmailCookie.cs   Small helpers for the login
   UserPreferences.cs         Reads and saves a logged-in user's preferences (the preferred language)
   UserProfiles.cs, BirthDate.cs   Saves and checks the birthday given at sign-up
+  CardChecker.cs             Photo in, card and price out, for the Check page
   FormGuard.cs               Trap field and time stamp check for the public forms
   Turnstile.cs               Cloudflare Turnstile: settings and the server-side token check
   FormChecks.cs              Runs the form guard and Turnstile for a form post
@@ -582,6 +666,7 @@ Resources/                   SharedResource.resx (English) and SharedResource.da
 Scripts/deploy.ps1           IIS setup and deployment
 wwwroot/css/home.css         Front page styles
 wwwroot/js/password-toggle.js  The eye button on password fields
+wwwroot/js/check.js, card-frame.js  The Check page script, and the camera outline and "card is in the frame" check
 ```
 
 ## Known limits

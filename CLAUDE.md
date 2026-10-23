@@ -23,12 +23,12 @@ Repo: `https://github.com/phongvl/CardTradeBuddy.git`, branch `main`. Related re
 
 ```
 Pages/            Index (front page), Account/ (Login, Register, ForgotPassword, ResetPassword, VerifyEmail, Logout), Start (page after
-                  login: Check a card / Fair swap?), ProtoUpload (card
+                  login: Check a card / Fair swap?), Check (take/upload a photo, result), ProtoUpload (developer test page, card
                   scanner, login required), SetLanguage, Shared/ (_Layout, _LayoutHome, _Hero + _HeroArtLogin/_HeroArtRegister,
                   _LoginSheet, _PasswordField, _FormGuard, _Turnstile)
 Services/         LoginServerClient, UserPreferences, UserProfiles, BirthDate, FormGuard, FormChecks, Turnstile, ClientIp, EmailAddress,
                   PasswordRules, RememberedEmailCookie; card pipeline: CardImagePreprocessor, OllamaLlmService, TcgDexCardDataProvider,
-                  PriceCalculator, TradeEvaluator, FrankfurterExchangeRateService
+                  CardChecker (used by /Check), PriceCalculator, TradeEvaluator, FrankfurterExchangeRateService
 Data/             AppDbContext, UserPreference (user_preferences), UserProfile (user_profiles), Migrations/
 Localization/     AppLanguages (en, da), LanguageCookie
 Resources/        SharedResource.resx (English) + SharedResource.da.resx. Add every new text to BOTH.
@@ -66,8 +66,17 @@ Scripts/deploy.ps1  IIS deploy; wwwroot/css/home.css  all front page styles; www
 - **Login:** this app has its own login page and checks passwords server-to-server with the LoginServer (password grant; scopes
   `users.create`, `users.verify`, `passwords.reset` with client credentials). Cookie auth `cardtradebuddy.session`, "Remember me"
   = 30 days plus an email-prefill cookie. No account enumeration: "already exists" and "created" look the same.
-- **Start page** (`/Start`, `LoginForm.HomePath`): where login ends. Two halves: Check a card (links to `/ProtoUpload`, which is kept
-  as it is) and Fair swap? ("Coming soon", no page yet). Pictures are inline SVG partials; phone must fit both halves on one screen.
+- **Start page** (`/Start`, `LoginForm.HomePath`): where login ends. Two halves: Check a card (links to `/Check`) and Fair swap?
+  ("Coming soon", no page yet). Pictures are inline SVG partials; phone must fit both halves on one screen. `/ProtoUpload` is the old
+  developer test page: keep it as it is.
+- **Saved cards icon** in the header of Start and Check (`_SavedCardsIcon`, logged-in only): icon only, no page behind it yet.
+- **Check page** (`/Check`): take/upload a photo (`wwwroot/js/check.js`: full-screen camera with a card outline that turns green
+  when a card sits in it (`card-frame.js`) and crops to the outline; native camera app as a fallback on phones; drag and drop; shrink
+  to 2400 px), preview, then `CardChecker` reads the card with Ollama + TCGdex and shows card and price (kroner when Danish).
+  Its card prompt is a copy of ProtoUpload's: change both together. Rate limit `scan` per user.
+- **Albums and cards:** tables `albums` (one default album per user, created on first add; no way to make more yet) and `cards` (belongs to
+  exactly one album; all card info incl. image URLs, `Pricing` jsonb, `EstimatedPriceEur`, `PricesCheckedAt`). `AlbumService` does it;
+  the Check page's "Add to my album" posts the signed result. The user's photo is never stored.
 - **Create user:** birthday required, minimum age `Account:MinimumAge` (13). Saved in `user_profiles` only for a brand-new account.
   Email confirmation is off by default (`Login:VerifyEmail`).
 - **Currency follows the language:** Danish page = kroner (`kr.`, converted for display with the EUR -> DKK rate), other languages = euros.

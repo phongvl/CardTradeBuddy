@@ -81,5 +81,54 @@
   <data name="StartArtCheck" xml:space="preserve"><value>Two cards under a magnifying glass, with the set and the price</value></data>
   <data name="StartArtSwap" xml:space="preserve"><value>Two kids lying on a rug, trading cards</value></data>
   <data name="StartTagPrice" xml:space="preserve"><value>€ 3.20</value></data>
+  <data name="CheckHeading" xml:space="preserve"><value>Show us your card</value></data>
+  <data name="CheckIntro" xml:space="preserve"><value>Take a photo or choose one from your device.</value></data>
+  <data name="CheckArtLabel" xml:space="preserve"><value>A card inside a camera viewfinder</value></data>
+  <data name="TakePhoto" xml:space="preserve"><value>Take a photo</value></data>
+  <data name="UseCamera" xml:space="preserve"><value>Use camera</value></data>
+  <data name="UploadImage" xml:space="preserve"><value>Upload an image</value></data>
+  <data name="DropHere" xml:space="preserve"><value>Drop a photo here</value></data>
+  <data name="OrChooseBelow" xml:space="preserve"><value>or choose below</value></data>
+  <data name="TipWhole" xml:space="preserve"><value>Whole card in view</value></data>
+  <data name="TipLight" xml:space="preserve"><value>Good light, no glare</value></data>
+  <data name="TipNotSaved" xml:space="preserve"><value>Photos are never saved</value></data>
+  <data name="BackToStart" xml:space="preserve"><value>Back to Start</value></data>
+  <data name="PreviewLabel" xml:space="preserve"><value>Your photo</value></data>
+  <data name="CheckThisCard" xml:space="preserve"><value>Check this card</value></data>
+  <data name="ChooseAnother" xml:space="preserve"><value>Choose another</value></data>
+  <data name="CheckAnother" xml:space="preserve"><value>Check another card</value></data>
+  <data name="CheckLooking" xml:space="preserve"><value>Finding the card...</value></data>
+  <data name="CheckNeedsScript" xml:space="preserve"><value>This page needs JavaScript to choose a photo.</value></data>
+  <data name="CameraTake" xml:space="preserve"><value>Take photo</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="CameraDenied" xml:space="preserve"><value>We could not open the camera. Choose a photo instead.</value></data>
+  <data name="CheckErrBadImage" xml:space="preserve"><value>We could not read that file. Use a photo (JPEG or PNG) under {0} MB.</value></data>
+  <data name="CheckErrNotCard" xml:space="preserve"><value>This does not look like a Pokémon card.</value></data>
+  <data name="CheckErrUpsideDown" xml:space="preserve"><value>We could not read the card. Try a photo with the card upright.</value></data>
+  <data name="CheckErrUnreadable" xml:space="preserve"><value>This looks like a Pokémon card, but we could not read its name or number. Try a closer photo.</value></data>
+  <data name="CheckErrNotFound" xml:space="preserve"><value>We read &quot;{0}&quot; but could not find that card in our list.</value></data>
+  <data name="CheckErrUnavailable" xml:space="preserve"><value>The card reader is not available right now. Try again in a moment.</value></data>
+  <data name="ResSet" xml:space="preserve"><value>Set</value></data>
+  <data name="ResNumber" xml:space="preserve"><value>Number</value></data>
+  <data name="ResRarity" xml:space="preserve"><value>Rarity</value></data>
+  <data name="ResPrice" xml:space="preserve"><value>Estimated price</value></data>
+  <data name="ResAllFinishes" xml:space="preserve"><value>Price per finish</value></data>
+  <data name="ResFinishNormal" xml:space="preserve"><value>Normal</value></data>
+  <data name="ResFinishHolo" xml:space="preserve"><value>Holofoil</value></data>
+  <data name="ResFinishReverse" xml:space="preserve"><value>Reverse holofoil</value></data>
+  <data name="ResAssumed" xml:space="preserve"><value>We could not see the finish in the photo, so this is for the {0} version.</value></data>
+  <data name="ResDisagree" xml:space="preserve"><value>The shops disagree too much on this card to give one price.</value></data>
+  <data name="ResNoPrice" xml:space="preserve"><value>There is no price for this card.</value></data>
+  <data name="ResNote" xml:space="preserve"><value>An estimate from Cardmarket and TCGplayer prices at today&apos;s rates.</value></data>
+  <data name="CameraHint" xml:space="preserve"><value>Fit the whole card inside the frame</value></data>
+  <data name="CameraReady" xml:space="preserve"><value>Looks good. Take the picture now</value></data>
+  <data name="CameraCloser" xml:space="preserve"><value>Move a little closer</value></data>
+  <data name="CameraFurther" xml:space="preserve"><value>Move a little further away</value></data>
+  <data name="SavedCards" xml:space="preserve"><value>Saved cards</value></data>
+  <data name="AddToAlbum" xml:space="preserve"><value>Add to my album</value></data>
+  <data name="AddedToAlbum" xml:space="preserve"><value>Added to {0}.</value></data>
+  <data name="DefaultAlbumName" xml:space="preserve"><value>My cards</value></data>
+  <data name="AlbumErrUnavailable" xml:space="preserve"><value>We could not save the card right now. Try again in a moment.</value></data>
+  <data name="CheckErrExpired" xml:space="preserve"><value>This result is too old to add. Check the card again.</value></data>
 </root>
 

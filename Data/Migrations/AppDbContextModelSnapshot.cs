@@ -22,6 +22,139 @@ namespace CardTradeBuddy.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("CardTradeBuddy.Data.Album", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "UserId" }, "IX_albums_UserId");
+
+                    b.HasIndex(new[] { "UserId" }, "IX_albums_UserId_default")
+                        .IsUnique()
+                        .HasFilter("\"IsDefault\" = true");
+
+                    b.ToTable("albums", (string)null);
+                });
+
+            modelBuilder.Entity("CardTradeBuddy.Data.Card", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("AddedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("AlbumId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CardId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("Category")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<decimal?>("EstimatedPriceEur")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("numeric(12,2)");
+
+                    b.Property<string>("Finish")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<bool>("FinishAssumed")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("Hp")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Illustrator")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("LocalId")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime>("PricesCheckedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Pricing")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Rarity")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<int?>("Retreat")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SetId")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("SetLogoUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("SetName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int?>("SetOfficialCardCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Stage")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.PrimitiveCollection<string[]>("Types")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AlbumId");
+
+                    b.ToTable("cards", (string)null);
+                });
+
             modelBuilder.Entity("CardTradeBuddy.Data.UserPreference", b =>
                 {
                     b.Property<string>("UserId")
@@ -55,6 +188,22 @@ namespace CardTradeBuddy.Data.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("user_profiles", (string)null);
+                });
+
+            modelBuilder.Entity("CardTradeBuddy.Data.Card", b =>
+                {
+                    b.HasOne("CardTradeBuddy.Data.Album", "Album")
+                        .WithMany("Cards")
+                        .HasForeignKey("AlbumId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Album");
+                });
+
+            modelBuilder.Entity("CardTradeBuddy.Data.Album", b =>
+                {
+                    b.Navigation("Cards");
                 });
 #pragma warning restore 612, 618
         }

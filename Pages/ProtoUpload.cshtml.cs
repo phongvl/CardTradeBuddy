@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using CardTradeBuddy.Services;
@@ -94,6 +95,17 @@ public class ProtoUploadModel(ILlmService llm, ICardDataProvider cards, IExchang
 
     /// <summary>Euros per US dollar used for the conversion; null when the rate was unavailable.</summary>
     public decimal? UsdToEur { get; private set; }
+
+    /// <summary>Danish kroner per euro when the page is in Danish and the rate was available; null means prices are shown in euros.</summary>
+    public decimal? EurToDkk { get; private set; }
+
+    /// <summary>The currency the calculated prices are shown in: kroner in Danish, euros otherwise.</summary>
+    public string CurrencyCode => EurToDkk is null ? "EUR" : "DKK";
+
+    /// <summary>A calculated price (kept in euros internally) written in the page's currency: "12,34 kr." in Danish, "€12.34" otherwise.</summary>
+    public string Money(decimal eur) => EurToDkk is { } rate
+        ? string.Format(CultureInfo.CurrentCulture, "{0:N2} kr.", eur * rate)
+        : string.Format(CultureInfo.CurrentCulture, "€{0:0.00}", eur);
 
     public async Task OnGetAsync(CancellationToken cancellationToken)
     {
@@ -212,6 +224,9 @@ public class ProtoUploadModel(ILlmService llm, ICardDataProvider cards, IExchang
 
             Card = await cards.GetCardByNameAndIdAsync(name, localId, setCode, languageCode, total);
             UsdToEur = await rates.GetUsdToEurAsync(cancellationToken);
+            // Danish page: always show kroner (the prices are still worked out in euros).
+            if (CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "da")
+                EurToDkk = await rates.GetEurToDkkAsync(cancellationToken);
             AveragePrice = PriceCalculator.Calculate(Card?.Pricing, finish, UsdToEur);
             AveragePrices = PriceCalculator.CalculateAll(Card?.Pricing, UsdToEur);
             Message = Card is null

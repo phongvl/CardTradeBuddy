@@ -480,3 +480,254 @@ body.home {
     margin: 0 0 12px;
     min-height: 65px;
 }
+
+/* ---- Start page: the page after login, two big halves (see Pages/Start.cshtml) ---- */
+
+.start-page {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+.start-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px 4px;
+}
+
+/* The flags sit in the header here, not pinned to the corner of the window. */
+.start-header .lang-switch {
+    position: static;
+    margin: 0 0 0 -8px;
+}
+
+.start-title {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+}
+
+.start-brand {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.start-user {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.start-logout {
+    margin: 0;
+}
+
+.btn-logout {
+    min-height: 44px;
+    padding: 0 14px;
+    border: 2px solid var(--blue);
+    border-radius: 12px;
+    background: transparent;
+    color: var(--blue-dark);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.start-modes {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 4px 10px 12px;
+}
+
+.mode {
+    --mode-bg: #cfe3ff;
+    --mode-blob: #9cc2ff;
+    --mode-ink: #12306b;
+    --mode-cta: #1d4ed8;
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+    border-radius: 24px;
+    background: var(--mode-bg);
+    color: var(--mode-ink);
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.mode-swap {
+    --mode-bg: #ffd9a0;
+    --mode-blob: #ffb866;
+    --mode-ink: #7a3e00;
+    --mode-cta: #c2410c;
+}
+
+/* The big soft circle behind the picture. */
+.mode::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 4%;
+    width: 120%;
+    aspect-ratio: 1;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: var(--mode-blob);
+}
+
+.mode-art {
+    position: relative;
+    display: block;
+    width: 100%;
+    max-width: 460px;
+    height: auto;
+    /* Phone: both halves should fit on one screen, so the picture gives way before the text does. */
+    max-height: max(120px, calc(50dvh - 192px));
+    margin: 12px auto 0;
+}
+
+.mode-text {
+    position: relative;
+    display: block;
+    padding: 4px 18px 18px;
+}
+
+.mode-text h2 {
+    margin: 0;
+    font-size: 24px;
+    line-height: 1.2;
+}
+
+.mode-text p {
+    margin: 4px 0 12px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.mode-go {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 22px;
+    border-radius: 20px;
+    background: var(--mode-cta);
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.mode:focus-visible {
+    outline: 4px solid var(--navy);
+    outline-offset: -4px;
+}
+
+/* Not a link yet: a little paler, nothing to press. */
+.mode.is-soon .mode-go {
+    background: transparent;
+    border: 2px dashed var(--mode-cta);
+    color: var(--mode-ink);
+}
+
+@media (min-width: 560px) {
+    .mode-art {
+        max-height: none;
+    }
+
+    .start-modes {
+        max-width: 720px;
+        width: 100%;
+        box-sizing: border-box;
+        margin: 0 auto;
+    }
+
+    .start-user {
+        font-size: 13px;
+    }
+}
+
+@media (min-width: 900px) {
+    .start-header {
+        padding: 10px 24px 6px;
+    }
+
+    .start-brand {
+        font-size: 26px;
+    }
+
+    /* A fixed, calm height: on a tall window the halves would otherwise stretch into two long strips. */
+    .start-modes {
+        flex: none;
+        width: 100%;
+        max-width: 1120px;
+        height: clamp(420px, calc(100dvh - 150px), 560px);
+        box-sizing: border-box;
+        margin: auto;
+        flex-direction: row;
+        gap: 16px;
+        padding: 6px 24px 24px;
+    }
+
+    .mode {
+        justify-content: space-between;
+        transition: flex-grow 0.25s ease, filter 0.25s ease;
+    }
+
+    .mode::before {
+        top: 8%;
+        width: 100%;
+    }
+
+    .mode-art {
+        margin-top: 8%;
+    }
+
+    .mode-text {
+        padding: 8px 32px 32px;
+    }
+
+    .mode-text h2 {
+        font-size: 34px;
+    }
+
+    .mode-text p {
+        margin: 6px 0 18px;
+        font-size: 17px;
+    }
+
+    .mode-go {
+        min-height: 48px;
+        padding: 0 30px;
+        font-size: 17px;
+        border-radius: 24px;
+    }
+
+    /* The half under the pointer grows a little, the other one steps back. */
+    a.mode:hover {
+        flex-grow: 1.25;
+    }
+
+    .start-modes:hover .mode:not(:hover) {
+        filter: saturate(0.85);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mode {
+        transition: none;
+    }
+}

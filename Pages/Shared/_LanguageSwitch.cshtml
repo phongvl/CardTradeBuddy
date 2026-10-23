@@ -1,0 +1,38 @@
+﻿@using System.Globalization
+@{
+    var language = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+}
+@* Each flag posts its language code to /set-language, which stores it in the language cookie and returns to this page. *@
+<form method="post" asp-page="/SetLanguage" class="lang-switch" aria-label="@T["LanguageNavLabel"]">
+    <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+    <button type="submit" name="culture" value="en" class="lang @(language == "en" ? "is-active" : "")" lang="en" aria-pressed="@(language == "en" ? "true" : "false")" aria-label="English">
+        <svg viewBox="0 0 60 60" aria-hidden="true">
+            <clipPath id="clip-en"><circle cx="30" cy="30" r="30" /></clipPath>
+            <defs><polygon id="eu-star" points="0.00,-5.00 1.12,-1.55 4.76,-1.55 1.82,0.59 2.94,4.05 0.00,1.91 -2.94,4.05 -1.82,0.59 -4.76,-1.55 -1.12,-1.55" fill="#FFCC00" /></defs>
+            <g clip-path="url(#clip-en)">
+                <rect width="60" height="60" fill="#003399" />
+                <use href="#eu-star" x="30.00" y="12.00" />
+                <use href="#eu-star" x="39.00" y="14.41" />
+                <use href="#eu-star" x="45.59" y="21.00" />
+                <use href="#eu-star" x="48.00" y="30.00" />
+                <use href="#eu-star" x="45.59" y="39.00" />
+                <use href="#eu-star" x="39.00" y="45.59" />
+                <use href="#eu-star" x="30.00" y="48.00" />
+                <use href="#eu-star" x="21.00" y="45.59" />
+                <use href="#eu-star" x="14.41" y="39.00" />
+                <use href="#eu-star" x="12.00" y="30.00" />
+                <use href="#eu-star" x="14.41" y="21.00" />
+                <use href="#eu-star" x="21.00" y="14.41" />
+            </g>
+        </svg>
+    </button>
+    <button type="submit" name="culture" value="da" class="lang @(language == "da" ? "is-active" : "")" lang="da" aria-pressed="@(language == "da" ? "true" : "false")" aria-label="Dansk">
+        <svg viewBox="0 0 60 60" aria-hidden="true">
+            <clipPath id="clip-da"><circle cx="30" cy="30" r="30" /></clipPath>
+            <g clip-path="url(#clip-da)">
+                <rect width="60" height="60" fill="#C8102E" />
+                <path d="M22 0 V60 M0 30 H60" stroke="#FFFFFF" stroke-width="8" />
+            </g>
+        </svg>
+    </button>
+</form>

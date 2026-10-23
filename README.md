@@ -23,6 +23,7 @@ ASP.NET Core Razor Pages on .NET 10. Hosted on Windows with IIS.
 12. [Languages](#languages)
 13. [Database (preferences)](#database-preferences)
 14. [Front page design](#front-page-design)
+    - [Start page](#start-page)
 15. [Project layout](#project-layout)
 16. [Known limits](#known-limits)
 
@@ -31,6 +32,7 @@ ASP.NET Core Razor Pages on .NET 10. Hosted on Windows with IIS.
 | Part | State |
 | --- | --- |
 | Front page (`/`) and account pages | Working: log in, create user, forgot password, reset password, confirm email and log out, all through the LoginServer (see [Login](#login-loginserver)), plus the language flags. |
+| Start page (`/Start`) | Working, for logged-in users only; where login ends. Two big halves: **Check a card** (opens `/ProtoUpload`) and **Fair swap?** (shown as "Coming soon": there is no page behind it yet). See [Start page](#start-page). |
 | Test page (`/ProtoUpload`) | Working, for logged-in users only. Upload a card photo, pick an Ollama model, see what was read, the card and its prices. Uploads are never saved to disk. |
 | `TradeEvaluator` | Working as a function. Not connected to any page yet. |
 | Storing trades or other per-user data | Not built. The app has no database of its own; users live in the LoginServer. |
@@ -108,7 +110,7 @@ ResetPassword, VerifyEmail, Logout); the front page shows the same login box.
   Pressing it shows what was typed and pressing again hides it; a visible password is hidden again when the form is sent.
   Without JavaScript the button stays hidden, so there is never a button that does nothing.
 - `/ProtoUpload` requires a login (`AuthorizePage` in `Program.cs`). A visitor who is not logged in is sent to
-  `/Account/Login`, and after logging in returns to the page they asked for, or to `/ProtoUpload`.
+  `/Account/Login`, and after logging in returns to the page they asked for, or to `/Start` (`LoginForm.HomePath`). `/Start` also requires a login.
 
 ### Protections
 
@@ -290,7 +292,7 @@ photo
   -> Ollama (vision model, JSON reply): isPokemonCard, name, setCode, languageCode,
                                         cardNumber, localId, finish, upsideDown
   -> TcgDexCardDataProvider: find the card, cross-check the set
-  -> FrankfurterExchangeRateService: USD -> EUR rate
+  -> FrankfurterExchangeRateService: USD -> EUR rate (and EUR -> DKK for the Danish page)
   -> PriceCalculator: estimated price per finish
 ```
 
@@ -467,6 +469,11 @@ English and Danish, using standard ASP.NET Core localization.
   At the next login, on any device, the saved language replaces the browser's cookie. A visitor who is not logged in only gets the cookie.
 - The page's `lang` attribute follows the chosen language.
 - Numbers also follow the language, so on `/ProtoUpload` a Danish visitor sees `0,04` and an English one `0.04`.
+- **Currency follows the language:** a Danish page shows prices in kroner (`23,87 kr.`), every other language in euros (`€12.34`).
+  The prices are still worked out in EUR (see [How prices are calculated](#how-prices-are-calculated)) and converted only for display,
+  with the day's EUR -> DKK rate from Frankfurter (`GetEurToDkkAsync`, cached 6 hours). The raw marketplace figures keep their own
+  currency and label (TCGplayer USD). If the rate cannot be fetched the Danish page falls back to euros rather than showing a wrong number.
+  The sample price on the Start page is a resource text (`StartTagPrice`).
 
 **To add a language:** add its code to `Localization/AppLanguages.cs`, add a `SharedResource.<code>.resx` next to the
 existing ones, and add a flag button to the language switch in `Pages/Shared/_Hero.cshtml`.
@@ -518,6 +525,24 @@ Notes: the text typed inside the fields stays at 16 px, because anything smaller
 zoom into the page when a field is tapped. The illustration is an inline SVG and scales to any width. Safe-area
 padding keeps the buttons clear of the iPhone home bar.
 
+### Start page
+
+The page after login (`Pages/Start.cshtml`, styles at the end of `home.css`). The header has the language flags, the logo with
+"Signed in as ...", and Log out. Below it are the two modes, each a half of the screen with its own pastel backdrop and picture:
+
+| Mode | Look | Goes to |
+| --- | --- | --- |
+| Check a card | Blue backdrop, two cards under a magnifying glass, tags for set and price (`Pages/Shared/_StartArtCheck.cshtml`) | `/ProtoUpload` |
+| Fair swap? | Orange backdrop, two kids lying on a rug trading cards (`_StartArtSwap.cshtml`) | Nothing yet: shown with a "Coming soon" badge and not a link. Make it an `<a asp-page="...">` like the other half when the page exists. |
+
+- **Phone (under 560 px):** the halves are stacked and both fit on one screen: the pictures give way before the text does
+  (`max-height` on `.mode-art`). **Tablet:** the same, in a centered column. **Desktop (900 px and up):** side by side; the half under
+  the pointer grows a little (not with reduced-motion).
+- The pictures are inline SVGs, so there are no image files and they scale to any width. The texts are in the resource files
+  (`StartCheckTitle`, `StartSwapText`, ...), English and Danish.
+- The language flags are the shared partial `_LanguageSwitch.cshtml` (also used by the hero on the login pages).
+- `/ProtoUpload` is unchanged and still reachable directly.
+
 ## Project layout
 
 ```
@@ -525,9 +550,12 @@ Pages/
   Index.cshtml(.cs)          Front page: the login box
   Account/                   Login, Register (with birthday), ForgotPassword, ResetPassword, VerifyEmail, Logout
   SetLanguage.cshtml(.cs)    Where the language flags post to
+  Start.cshtml(.cs)          The page after login: Check a card / Fair swap? (login required)
   ProtoUpload.cshtml(.cs)    Card recognition test page (login required)
   Shared/_Layout.cshtml      HTML shell (language attribute, optional Head section)
   Shared/_LayoutHome.cshtml  The cheerful look used by the front page and the account pages
+  Shared/_LanguageSwitch.cshtml   The language flags
+  Shared/_StartArtCheck.cshtml, _StartArtSwap.cshtml   The two pictures on the Start page
   Shared/_Hero.cshtml        Flags, title, tagline and the illustration (_HeroArtLogin, or _HeroArtRegister when a page sets ViewData["HeroArt"] = "register")
   Shared/_FormGuard.cshtml   The hidden trap field, time stamp and Turnstile widget inside the public forms
   Shared/_Turnstile.cshtml   The Cloudflare Turnstile widget
@@ -546,7 +574,7 @@ Services/
   TcgDexCardDataProvider.cs  Card lookup, set cross-check, stale-price retry (ICardDataProvider)
   CardData.cs                The card and its prices
   PriceCalculator.cs         Estimated price per finish, outlier filtering
-  FrankfurterExchangeRateService.cs   USD -> EUR rate, cached (IExchangeRateService)
+  FrankfurterExchangeRateService.cs   USD -> EUR and EUR -> DKK rates, cached (IExchangeRateService)
   TradeEvaluator.cs          Fair-trade check and TradeOptions
 Localization/              AppLanguages (supported languages), LanguageCookie (sets the language cookie)
 Data/                      AppDbContext, UserPreference (table user_preferences) and Migrations/

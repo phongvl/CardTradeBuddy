@@ -70,5 +70,16 @@
   <data name="BirthdayTooYoung" xml:space="preserve"><value>You must be at least {0} years old to create a user.</value></data>
   <data name="FormExpired" xml:space="preserve"><value>The form was not sent. Reload the page and try again.</value></data>
   <data name="TurnstileFailed" xml:space="preserve"><value>We could not check that you are a person. Wait a moment and try again.</value></data>
+  <data name="StartTitle" xml:space="preserve"><value>Start</value></data>
+  <data name="StartCheckTitle" xml:space="preserve"><value>Check a card</value></data>
+  <data name="StartCheckText" xml:space="preserve"><value>Snap a photo and see set, rarity and price</value></data>
+  <data name="StartSwapTitle" xml:space="preserve"><value>Fair swap?</value></data>
+  <data name="StartSwapText" xml:space="preserve"><value>Put two piles of cards side by side</value></data>
+  <data name="StartGo" xml:space="preserve"><value>Start</value></data>
+  <data name="StartSoon" xml:space="preserve"><value>Coming soon</value></data>
+  <data name="StartTagSet" xml:space="preserve"><value>Set</value></data>
+  <data name="StartArtCheck" xml:space="preserve"><value>Two cards under a magnifying glass, with the set and the price</value></data>
+  <data name="StartArtSwap" xml:space="preserve"><value>Two kids lying on a rug, trading cards</value></data>
+  <data name="StartTagPrice" xml:space="preserve"><value>€ 3.20</value></data>
 </root>
 

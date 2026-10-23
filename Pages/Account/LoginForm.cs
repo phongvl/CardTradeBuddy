@@ -7,7 +7,7 @@ namespace CardTradeBuddy.Pages.Account;
 public class LoginForm
 {
     /// <summary>Where a successful login goes when nothing else was asked for.</summary>
-    public const string HomePath = "/ProtoUpload";
+    public const string HomePath = "/Start";
 
     public string Email { get; set; } = "";
     public bool RememberMe { get; set; }

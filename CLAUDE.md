@@ -22,7 +22,8 @@ Repo: `https://github.com/phongvl/CardTradeBuddy.git`, branch `main`. Related re
 ## Layout
 
 ```
-Pages/            Index (front page), Account/ (Login, Register, ForgotPassword, ResetPassword, VerifyEmail, Logout), ProtoUpload (card
+Pages/            Index (front page), Account/ (Login, Register, ForgotPassword, ResetPassword, VerifyEmail, Logout), Start (page after
+                  login: Check a card / Fair swap?), ProtoUpload (card
                   scanner, login required), SetLanguage, Shared/ (_Layout, _LayoutHome, _Hero + _HeroArtLogin/_HeroArtRegister,
                   _LoginSheet, _PasswordField, _FormGuard, _Turnstile)
 Services/         LoginServerClient, UserPreferences, UserProfiles, BirthDate, FormGuard, FormChecks, Turnstile, ClientIp, EmailAddress,
@@ -65,8 +66,12 @@ Scripts/deploy.ps1  IIS deploy; wwwroot/css/home.css  all front page styles; www
 - **Login:** this app has its own login page and checks passwords server-to-server with the LoginServer (password grant; scopes
   `users.create`, `users.verify`, `passwords.reset` with client credentials). Cookie auth `cardtradebuddy.session`, "Remember me"
   = 30 days plus an email-prefill cookie. No account enumeration: "already exists" and "created" look the same.
+- **Start page** (`/Start`, `LoginForm.HomePath`): where login ends. Two halves: Check a card (links to `/ProtoUpload`, which is kept
+  as it is) and Fair swap? ("Coming soon", no page yet). Pictures are inline SVG partials; phone must fit both halves on one screen.
 - **Create user:** birthday required, minimum age `Account:MinimumAge` (13). Saved in `user_profiles` only for a brand-new account.
   Email confirmation is off by default (`Login:VerifyEmail`).
+- **Currency follows the language:** Danish page = kroner (`kr.`, converted for display with the EUR -> DKK rate), other languages = euros.
+  Prices are calculated in EUR; `ProtoUploadModel.Money()` formats them. Any new price shown to users must go through the same rule.
 - **Language:** `?culture`, then the `.AspNetCore.Culture` cookie, then Accept-Language. A logged-in user's pick is saved in
   `user_preferences` and applied at the next login. Database trouble never blocks a login or a page (best effort, logged).
 - **Form protection:** anti-forgery on every POST (Razor Pages default), form guard (hidden trap field + signed time stamp, 2 s to 8 h)

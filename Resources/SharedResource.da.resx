@@ -70,5 +70,16 @@
   <data name="BirthdayTooYoung" xml:space="preserve"><value>Du skal være mindst {0} år for at oprette en bruger.</value></data>
   <data name="FormExpired" xml:space="preserve"><value>Formularen blev ikke sendt. Genindlæs siden og prøv igen.</value></data>
   <data name="TurnstileFailed" xml:space="preserve"><value>Vi kunne ikke tjekke, at du er et menneske. Vent lidt og prøv igen.</value></data>
+  <data name="StartTitle" xml:space="preserve"><value>Start</value></data>
+  <data name="StartCheckTitle" xml:space="preserve"><value>Tjek et kort</value></data>
+  <data name="StartCheckText" xml:space="preserve"><value>Tag et billede og se sæt, sjældenhed og pris</value></data>
+  <data name="StartSwapTitle" xml:space="preserve"><value>Fair bytte?</value></data>
+  <data name="StartSwapText" xml:space="preserve"><value>Læg to bunker kort side om side</value></data>
+  <data name="StartGo" xml:space="preserve"><value>Start</value></data>
+  <data name="StartSoon" xml:space="preserve"><value>Kommer snart</value></data>
+  <data name="StartTagSet" xml:space="preserve"><value>Sæt</value></data>
+  <data name="StartArtCheck" xml:space="preserve"><value>To kort under et forstørrelsesglas, med sættet og prisen</value></data>
+  <data name="StartArtSwap" xml:space="preserve"><value>To børn der ligger på et tæppe og bytter kort</value></data>
+  <data name="StartTagPrice" xml:space="preserve"><value>24 kr.</value></data>
 </root>
 

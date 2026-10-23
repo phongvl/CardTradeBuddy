@@ -68,7 +68,7 @@
             <li>
                 <strong>Calculated average price</strong>
                 (@(avg.Finish.ToString())@(avg.FinishAssumed ? ", finish assumed" : "")):
-                @(avg.AverageEur is { } avgEur ? $"€{avgEur:0.00}" : "n/a")
+                @(avg.AverageEur is { } avgEur ? Model.Money(avgEur) : "n/a")
             </li>
         }
         <li>Rarity: @(card.Rarity ?? "-")</li>
@@ -99,17 +99,17 @@
     <h3>Calculated average price per finish</h3>
     <table>
         <thead>
-            <tr><th>Finish</th><th>Cardmarket (EUR)</th><th>TCGplayer (USD)</th><th>TCGplayer (EUR)</th><th>Average (EUR)</th></tr>
+            <tr><th>Finish</th><th>Cardmarket (@Model.CurrencyCode)</th><th>TCGplayer (USD)</th><th>TCGplayer (@Model.CurrencyCode)</th><th>Average (@Model.CurrencyCode)</th></tr>
         </thead>
         <tbody>
             @foreach (var row in Model.AveragePrices)
             {
                 <tr>
                     <td>@row.Finish</td>
-                    <td>@(row.CardmarketEur is { } a ? $"€{a:0.00}" : "-")</td>
+                    <td>@(row.CardmarketEur is { } a ? Model.Money(a) : "-")</td>
                     <td>@(row.TcgPlayerUsd is { } b ? $"${b:0.00}" : "-")</td>
-                    <td>@(row.TcgPlayerEur is { } c ? $"€{c:0.00}" : "-")</td>
-                    <td><strong>@(row.AverageEur is { } d ? $"€{d:0.00}" : row.PricesDisagree ? "marketplaces disagree" : "-")</strong></td>
+                    <td>@(row.TcgPlayerEur is { } c ? Model.Money(c) : "-")</td>
+                    <td><strong>@(row.AverageEur is { } d ? Model.Money(d) : row.PricesDisagree ? "marketplaces disagree" : "-")</strong></td>
                 </tr>
             }
         </tbody>
@@ -117,7 +117,7 @@
     <p>
         @if (Model.UsdToEur is { } rate)
         {
-            <text>TCGplayer converted at 1 USD = @rate.ToString("0.#####") EUR (European Central Bank rate via Frankfurter).</text>
+            <text>TCGplayer converted at 1 USD = @rate.ToString("0.#####") EUR@(Model.EurToDkk is { } dkk ? $", and 1 EUR = {dkk.ToString("0.#####")} DKK" : "") (European Central Bank rates via Frankfurter).</text>
         }
         else
         {

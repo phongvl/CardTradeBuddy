@@ -16,8 +16,9 @@ if (builder.Environment.IsDevelopment())
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 builder.Services.AddRazorPages(options =>
 {
-    // The card scanner uses the GPU and the price services, so it is only for logged-in users.
+    // The card scanner uses the GPU and the price services, so it is only for logged-in users. The Start page is where login ends.
     options.Conventions.AuthorizePage("/ProtoUpload");
+    options.Conventions.AuthorizePage("/Start");
 }).AddViewLocalization();
 
 // Login: this app has its own login page and checks passwords with the LoginServer (server to server).

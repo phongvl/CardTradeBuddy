@@ -1,34 +1,5 @@
-﻿@using System.Globalization
-@{
-    var language = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
-}
-
-    <header class="hero">
-        @* Each flag posts its language code to /set-language, which stores it in the language cookie and returns to this page. *@
-        <form method="post" asp-page="/SetLanguage" class="lang-switch" aria-label="@T["LanguageNavLabel"]">
-            <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
-            <button type="submit" name="culture" value="en" class="lang @(language == "en" ? "is-active" : "")" lang="en" aria-pressed="@(language == "en" ? "true" : "false")" aria-label="English">
-                <svg viewBox="0 0 60 60" aria-hidden="true">
-                    <clipPath id="clip-en"><circle cx="30" cy="30" r="30" /></clipPath>
-                    <g clip-path="url(#clip-en)">
-                        <rect width="60" height="60" fill="#012169" />
-                        <path d="M0 0 L60 60 M60 0 L0 60" stroke="#FFFFFF" stroke-width="12" />
-                        <path d="M0 0 L60 60 M60 0 L0 60" stroke="#C8102E" stroke-width="4" />
-                        <path d="M30 0 V60 M0 30 H60" stroke="#FFFFFF" stroke-width="20" />
-                        <path d="M30 0 V60 M0 30 H60" stroke="#C8102E" stroke-width="12" />
-                    </g>
-                </svg>
-            </button>
-            <button type="submit" name="culture" value="da" class="lang @(language == "da" ? "is-active" : "")" lang="da" aria-pressed="@(language == "da" ? "true" : "false")" aria-label="Dansk">
-                <svg viewBox="0 0 60 60" aria-hidden="true">
-                    <clipPath id="clip-da"><circle cx="30" cy="30" r="30" /></clipPath>
-                    <g clip-path="url(#clip-da)">
-                        <rect width="60" height="60" fill="#C8102E" />
-                        <path d="M22 0 V60 M0 30 H60" stroke="#FFFFFF" stroke-width="8" />
-                    </g>
-                </svg>
-            </button>
-        </form>
+﻿    <header class="hero">
+        <partial name="_LanguageSwitch" />
 
         <h1 class="hero-title">CardTradeBuddy</h1>
         <p class="hero-tagline">@T["Tagline"]</p>

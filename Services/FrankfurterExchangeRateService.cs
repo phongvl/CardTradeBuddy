@@ -10,17 +10,22 @@ public class FrankfurterExchangeRateService(HttpClient http, IMemoryCache cache)
     // The ECB publishes once per working day, so there is no point asking more often.
     private static readonly TimeSpan CacheTime = TimeSpan.FromHours(6);
 
-    public async Task<decimal?> GetUsdToEurAsync(CancellationToken cancellationToken = default)
+    public Task<decimal?> GetUsdToEurAsync(CancellationToken cancellationToken = default) => GetRateAsync("USD", "EUR", cancellationToken);
+
+    public Task<decimal?> GetEurToDkkAsync(CancellationToken cancellationToken = default) => GetRateAsync("EUR", "DKK", cancellationToken);
+
+    private async Task<decimal?> GetRateAsync(string from, string to, CancellationToken cancellationToken)
     {
-        if (cache.TryGetValue("usd-eur", out decimal cached))
+        var key = $"{from}-{to}".ToLowerInvariant();
+        if (cache.TryGetValue(key, out decimal cached))
             return cached;
 
         try
         {
-            var response = await http.GetFromJsonAsync<RateResponse>("latest?base=USD&symbols=EUR", cancellationToken);
-            if (response?.Rates is { } rates && rates.TryGetValue("EUR", out var rate) && rate > 0)
+            var response = await http.GetFromJsonAsync<RateResponse>($"latest?base={from}&symbols={to}", cancellationToken);
+            if (response?.Rates is { } rates && rates.TryGetValue(to, out var rate) && rate > 0)
             {
-                cache.Set("usd-eur", rate, CacheTime);
+                cache.Set(key, rate, CacheTime);
                 return rate;
             }
         }

@@ -1,0 +1,43 @@
+@page
+@model CardTradeBuddy.Pages.StartModel
+@{
+    Layout = "_LayoutHome";
+    ViewData["Title"] = T["StartTitle"].Value;
+}
+
+<main class="start-page">
+    <header class="start-header">
+        <partial name="_LanguageSwitch" />
+
+        <div class="start-title">
+            <h1 class="start-brand">CardTradeBuddy</h1>
+            <span class="start-user">@T["SignedInAs", User.Identity?.Name ?? ""]</span>
+        </div>
+
+        <form method="post" asp-page="/Account/Logout" class="start-logout">
+            <button type="submit" class="btn-logout">@T["LogOut"]</button>
+        </form>
+    </header>
+
+    @* The two modes. Phone: stacked. Wide screens: side by side, the one under the pointer grows a little. *@
+    <div class="start-modes">
+        <a class="mode mode-check" asp-page="/ProtoUpload">
+            <partial name="_StartArtCheck" />
+            <span class="mode-text">
+                <h2>@T["StartCheckTitle"]</h2>
+                <p>@T["StartCheckText"]</p>
+                <span class="mode-go">@T["StartGo"]</span>
+            </span>
+        </a>
+
+        @* There is no page behind this half yet: shown, but not a link. *@
+        <div class="mode mode-swap is-soon" aria-disabled="true">
+            <partial name="_StartArtSwap" />
+            <span class="mode-text">
+                <h2>@T["StartSwapTitle"]</h2>
+                <p>@T["StartSwapText"]</p>
+                <span class="mode-go">@T["StartSoon"]</span>
+            </span>
+        </div>
+    </div>
+</main>

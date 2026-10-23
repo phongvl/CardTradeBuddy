@@ -5,7 +5,7 @@ using Microsoft.Extensions.Localization;
 
 namespace CardTradeBuddy.Pages;
 
-/// <summary>The front page: the login box. Someone who is already logged in goes straight on to the card scanner.</summary>
+/// <summary>The front page: the login box. Someone who is already logged in goes straight on to the Start page.</summary>
 public class IndexModel(IStringLocalizer<SharedResource> localizer) : PageModel
 {
     public LoginForm Form { get; private set; } = new();

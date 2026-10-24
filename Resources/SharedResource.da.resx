@@ -142,5 +142,32 @@
   <data name="FinishQuestion" xml:space="preserve"><value>Hvilken udgave har du?</value></data>
   <data name="FinishRequired" xml:space="preserve"><value>Vælg hvilken udgave af kortet du har.</value></data>
   <data name="AddedToAlbumFinish" xml:space="preserve"><value>Tilføjet til {0} som {1}.</value></data>
+  <data name="ConsentTitle" xml:space="preserve"><value>Cookies</value></data>
+  <data name="ConsentText" xml:space="preserve"><value>CardTradeBuddy bruger kun de cookies, den skal bruge for at virke: så du forbliver logget ind, formularerne er beskyttet, og dit sprog huskes. Der er ingen reklame- eller sporingscookies. For at bruge siden skal du acceptere dem.</value></data>
+  <data name="ConsentDetails" xml:space="preserve"><value>Hvilke cookies?</value></data>
+  <data name="ConsentCookieSession" xml:space="preserve"><value>Holder dig logget ind. Den forsvinder, når du lukker browseren, eller efter 30 dage, hvis du skæver Husk mig.</value></data>
+  <data name="ConsentCookieAntiforgery" xml:space="preserve"><value>Beskytter formularerne mod misbrug.</value></data>
+  <data name="ConsentCookieLanguage" xml:space="preserve"><value>Husker dit sprog i et år.</value></data>
+  <data name="ConsentCookieEmail" xml:space="preserve"><value>Husker din e-mailadresse i loginformularen i 30 dage, kun hvis du sætter hak i Husk mig.</value></data>
+  <data name="ConsentCookieTempData" xml:space="preserve"><value>Bringer en kort besked med til næste side, for eksempel at din adgangskode er ændret.</value></data>
+  <data name="ConsentCookieConsent" xml:space="preserve"><value>Husker, at du har accepteret cookies, i et år.</value></data>
+  <data name="ConsentCookieTurnstile" xml:space="preserve"><value>Tjekket af, at du er et menneske, i formularerne. Cloudflare kan sætte en sikkerhedscookie, mens det kører.</value></data>
+  <data name="ConsentAccept" xml:space="preserve"><value>Acceptér og fortsæt</value></data>
+  <data name="DisclaimerTitle" xml:space="preserve"><value>Vigtig information, før du fortsætter</value></data>
+  <data name="DisclaimerIntro" xml:space="preserve"><value>CardTradeBuddy er et værktøj, der hjælper samlere med at genkende samlekort og anslå deres værdi. Læs denne information omhyggeligt. Du skal acceptere den for at oprette en bruger.</value></data>
+  <data name="DisclaimerH1" xml:space="preserve"><value>Oplysningerne kan være unøjagtige</value></data>
+  <data name="DisclaimerP1" xml:space="preserve"><value>Kortoplysninger, priser og skøn på siden stammer fra tredjepartskilder og fra automatisk genkendelse af fotografier. De kan være ufuldstændige, forældede eller forkerte. Tjenesten kan fejlidentificere et kort, dets sæt, sprog eller udgave (normal, holofoil eller reverse holofoil).</value></data>
+  <data name="DisclaimerH2" xml:space="preserve"><value>Priser er skøn, ikke vurderinger</value></data>
+  <data name="DisclaimerP2" xml:space="preserve"><value>Alle priser er vejledende. Et korts faktiske markedsværdi afhænger af stand, sprog, udgave, gradering, markedsplads og tidspunkt. Intet på siden udgør en vurdering, et tilbud om køb eller salg eller finansiel rådgivning.</value></data>
+  <data name="DisclaimerH3" xml:space="preserve"><value>Kontrollér altid oplysningerne</value></data>
+  <data name="DisclaimerP3" xml:space="preserve"><value>Før du køber, sælger eller bytter et kort, skal du kontrollere kortets oplysninger og pris i flere uafhængige kilder, for eksempel etablerede markedspladser og prisguider, og mod selve kortet. Du er alene ansvarlig for dine beslutninger.</value></data>
+  <data name="DisclaimerH4" xml:space="preserve"><value>Ingen garanti og ansvarsbegrænsning</value></data>
+  <data name="DisclaimerP4" xml:space="preserve"><value>Tjenesten leveres ”som den er“ og ”som tilgængelig“, uden garantier af nogen art. I det videste omfang loven tillader det, påtager CardTradeBuddy og dens driftsansvarlige sig intet ansvar for tab eller skade som følge af tillid til oplysningerne på siden.</value></data>
+  <data name="DisclaimerH5" xml:space="preserve"><value>Ingen tilknytning</value></data>
+  <data name="DisclaimerP5" xml:space="preserve"><value>CardTradeBuddy er en uafhængig tjeneste. Den er ikke tilknyttet, godkendt eller sponsoreret af Nintendo, Creatures Inc., GAME FREAK inc., The Pokémon Company International eller nogen markedsplads, hvis data vises. Alle varemærker tilhører deres respektive ejere.</value></data>
+  <data name="DisclaimerClosing" xml:space="preserve"><value>Ved at vælge ”Jeg har læst og accepterer“ bekræfter du, at du har læst og forstået denne information.</value></data>
+  <data name="DisclaimerScrollHint" xml:space="preserve"><value>Rul til bunden af teksten for at fortsætte.</value></data>
+  <data name="DisclaimerAccept" xml:space="preserve"><value>Jeg har læst og accepterer</value></data>
+  <data name="DisclaimerRequired" xml:space="preserve"><value>Du skal læse og acceptere informationen for at oprette en bruger.</value></data>
 </root>
 

@@ -19,6 +19,9 @@ public class RegisterModel(LoginServerClient loginServer, UserProfiles profiles,
     /// <summary>The birthday as the date field posts it (yyyy-MM-dd).</summary>
     [BindProperty] public string Birthday { get; set; } = "";
 
+    /// <summary>"true" once the user has read and accepted the disclaimer in the popup (the page's script sets it). A user is not created without it.</summary>
+    [BindProperty] public bool DisclaimerAccepted { get; set; }
+
     public string? Error { get; private set; }
 
     /// <summary>The youngest age that may create a user (<c>Account:MinimumAge</c>, 13 by default).</summary>
@@ -59,6 +62,8 @@ public class RegisterModel(LoginServerClient loginServer, UserProfiles profiles,
         if (Password.Length < PasswordRules.MinLength) return localizer["PasswordTooShort", PasswordRules.MinLength];
         if (Password != ConfirmPassword) return localizer["PasswordsDiffer"];
 
+        if (!DisclaimerAccepted) return localizer["DisclaimerRequired"];
+
         var problem = BirthDate.Check(Birthday, DateOnly.FromDateTime(DateTime.Today), MinimumAge, out var birthDate);
         if (problem != BirthDateProblem.None)
             return problem switch
@@ -72,7 +77,7 @@ public class RegisterModel(LoginServerClient loginServer, UserProfiles profiles,
 
         // Only a brand-new account gets a birthday saved. "Already exists" looks the same to the visitor, and must not change someone else's data.
         if (result is { Outcome: SignUpOutcome.Created, UserId: { } newUserId })
-            await profiles.SaveBirthDateAsync(newUserId.ToString(), birthDate, HttpContext.RequestAborted);
+            await profiles.SaveSignUpAsync(newUserId.ToString(), birthDate, HttpContext.RequestAborted);
 
         return result.Outcome switch
         {

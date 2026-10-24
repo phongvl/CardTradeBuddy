@@ -78,7 +78,12 @@ Scripts/deploy.ps1  IIS deploy; wwwroot/css/home.css  all front page styles; www
 - **Albums and cards:** tables `albums` (one default album per user, created on first add; no way to make more yet) and `cards` (belongs to
   exactly one album; all card info incl. image URLs, `Pricing` jsonb, `EstimatedPriceEur`, `PricesCheckedAt`). `AlbumService` does it;
   the Check page's "Add to my album" posts the signed result and the finish the user must choose (normal / holofoil / reverse holofoil, tiles with icons from `_FinishSprite`; the price saved is for that finish). The user's photo is never stored.
-- **Create user:** birthday required, minimum age `Account:MinimumAge` (13). Saved in `user_profiles` only for a brand-new account.
+- **Cookie consent:** every page (via `_Layout`) shows a blocking dialog until `cardtradebuddy.consent` is set (`/Consent` post). All cookies are
+  essential, so there is no decline button. **A new cookie must be added to the dialog's list** (and `ConsentCookie.Version` raised). To test as a
+  fresh visitor use `http://127.0.0.1:5301` (its cookies are separate from `localhost`).
+- **Create user:** the "Create user" button opens a disclaimer popup (prices/information may be inaccurate, always verify; read to the end, then accept);
+  the server refuses a sign-up without `DisclaimerAccepted=true` and stores `DisclaimerAcceptedAt`/`DisclaimerVersion` in `user_profiles`
+  (`Disclaimer.Version`). Birthday required, minimum age `Account:MinimumAge` (13). Saved in `user_profiles` only for a brand-new account.
   Email confirmation is off by default (`Login:VerifyEmail`).
 - **Currency follows the language:** Danish page = kroner (`kr.`, converted for display with the EUR -> DKK rate), other languages = euros.
   Prices are calculated in EUR; `ProtoUploadModel.Money()` formats them. Any new price shown to users must go through the same rule.

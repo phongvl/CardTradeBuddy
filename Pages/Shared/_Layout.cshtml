@@ -10,5 +10,6 @@
 <body class="@ViewData["BodyClass"]">
     @RenderBody()
     @await RenderSectionAsync("Scripts", required: false)
+    <partial name="_CookieConsent" />
 </body>
 </html>

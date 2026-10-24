@@ -185,6 +185,13 @@ namespace CardTradeBuddy.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTime?>("DisclaimerAcceptedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DisclaimerVersion")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
                     b.HasKey("UserId");
 
                     b.ToTable("user_profiles", (string)null);

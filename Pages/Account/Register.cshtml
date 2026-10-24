@@ -27,7 +27,10 @@
                 <p class="message error" role="alert">@Model.Error</p>
             }
 
-            <form method="post" novalidate>
+            <form method="post" id="register-form" novalidate>
+                @* Set by the popup when the disclaimer has been read and accepted (kept when the page comes back with an error). *@
+                <input type="hidden" id="disclaimer-accepted" name="DisclaimerAccepted" value="@(Model.DisclaimerAccepted ? "true" : "")" />
+
                 <div class="field">
                     <label for="email">@T["Email"]</label>
                     <input id="email" name="Email" type="email" inputmode="email" autocomplete="email" placeholder="@T["EmailPlaceholder"]" value="@Model.Email" />
@@ -46,6 +49,31 @@
                 <button type="submit" class="btn btn-primary">@T["CreateUser"]</button>
                 <a class="btn btn-secondary" asp-page="/Account/Login">@T["BackToLogin"]</a>
             </form>
+
+            @* The disclaimer popup: opens when the user presses "Create user" and must be read to the end and accepted before the user is created. *@
+            <dialog id="disclaimer" class="disclaimer" aria-labelledby="disclaimer-title">
+                <h2 id="disclaimer-title">@T["DisclaimerTitle"]</h2>
+                <div id="disclaimer-text" class="disclaimer-text" tabindex="0">
+                    <p>@T["DisclaimerIntro"]</p>
+                    <h3>@T["DisclaimerH1"]</h3>
+                    <p>@T["DisclaimerP1"]</p>
+                    <h3>@T["DisclaimerH2"]</h3>
+                    <p>@T["DisclaimerP2"]</p>
+                    <h3>@T["DisclaimerH3"]</h3>
+                    <p>@T["DisclaimerP3"]</p>
+                    <h3>@T["DisclaimerH4"]</h3>
+                    <p>@T["DisclaimerP4"]</p>
+                    <h3>@T["DisclaimerH5"]</h3>
+                    <p>@T["DisclaimerP5"]</p>
+                    <p class="disclaimer-close"><strong>@T["DisclaimerClosing"]</strong></p>
+                </div>
+                <p id="disclaimer-hint" class="disclaimer-hint" role="status">@T["DisclaimerScrollHint"]</p>
+                <div class="disclaimer-buttons">
+                    <button type="button" id="disclaimer-accept" class="btn btn-primary" disabled>@T["DisclaimerAccept"]</button>
+                    <button type="button" id="disclaimer-cancel" class="btn btn-secondary">@T["Cancel"]</button>
+                </div>
+            </dialog>
+            <script src="~/js/disclaimer.js" asp-append-version="true" defer></script>
         }
     </section>
 </main>

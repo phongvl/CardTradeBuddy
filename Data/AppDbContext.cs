@@ -26,6 +26,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.ToTable("user_profiles");
             e.HasKey(x => x.UserId);
             e.Property(x => x.UserId).HasMaxLength(64);
+            e.Property(x => x.DisclaimerVersion).HasMaxLength(32);
         });
 
         modelBuilder.Entity<Album>(e =>

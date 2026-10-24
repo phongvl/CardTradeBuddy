@@ -22,10 +22,11 @@ ASP.NET Core Razor Pages on .NET 10. Hosted on Windows with IIS.
 11. [How a trade is evaluated](#how-a-trade-is-evaluated)
 12. [Languages](#languages)
 13. [Database (preferences)](#database-preferences)
-14. [Front page design](#front-page-design)
+14. [Cookie consent](#cookie-consent)
+15. [Front page design](#front-page-design)
     - [Start page](#start-page)
-15. [Project layout](#project-layout)
-16. [Known limits](#known-limits)
+16. [Project layout](#project-layout)
+17. [Known limits](#known-limits)
 
 ## Status
 
@@ -137,6 +138,17 @@ ResetPassword, VerifyEmail, Logout); the front page shows the same login box.
 - **No account enumeration:** creating a user with an existing email, and asking for a password reset for an unknown
   email, give the same answer as the normal case.
 - **Open redirects:** the return address after login and after a language switch is only accepted if it is a path on this site.
+- **Disclaimer on sign-up.** Pressing "Create user" does not send the form: it opens a popup (`<dialog id="disclaimer">` in
+  `Pages/Account/Register.cshtml`, script `wwwroot/js/disclaimer.js`) with a notice that card details, prices and estimates may be
+  inaccurate, that prices are estimates and not valuations or advice, that the user must always verify against several independent
+  sources, that the service comes without warranty, and that it is not affiliated with Nintendo, The Pokémon Company or any marketplace.
+  The text has to be scrolled to the end before **I have read and accept** is enabled; **Cancel** closes the popup and nothing is sent.
+  Accepting sets the hidden field `DisclaimerAccepted` and sends the form (if the page comes back with an error the acceptance is kept,
+  so the popup does not open again). **The server refuses a sign-up without `DisclaimerAccepted=true`** ("You must read and accept the
+  notice to create a user"), so it cannot be skipped by posting the form directly. The text is in the resource keys `Disclaimer...`
+  (English and Danish). The acceptance is saved with the user in `user_profiles` (`DisclaimerAcceptedAt`, `DisclaimerVersion`);
+  change `Disclaimer.Version` whenever the wording changes in substance. Users created before it existed have no acceptance.
+  The wording is a plain-language notice, not legal advice: have it checked by a lawyer before relying on it.
 - **Age limit:** creating a user needs a birthday, and the user must be at least `Account:MinimumAge` years old (13 by default).
   The birthday is checked on the server (the date field's limits are only a convenience) and never shown to anyone.
 - **Passwords** must be at least 10 characters (the LoginServer's rule). They are never echoed back to the page or logged.
@@ -497,6 +509,8 @@ database only knows a user by the LoginServer user id (the `NameIdentifier` clai
 | --- | --- | --- |
 | `UserId` (primary key) | `varchar(64)` | The LoginServer user id. |
 | `BirthDate` | `date` | The birthday given when the user was created. Saved only for a brand-new account (never for an "already exists" answer). |
+| `DisclaimerAcceptedAt` | `timestamptz`, null | When the user accepted the disclaimer at sign-up (UTC). Null for users created before it existed. |
+| `DisclaimerVersion` | `varchar(32)`, null | Which version of the text was accepted (`Disclaimer.Version`, a date). |
 | `CreatedAt` | `timestamptz` | When the row was saved. |
 
 Users created before the birthday was asked for have no `user_profiles` row.
@@ -542,6 +556,25 @@ Debug build locked).
 - **Production:** create an empty `cardtradebuddy_prod` database, then deploy once with `-DatabaseConnectionString '...'` (or put the
   connection string on one line in `Scripts\prod.connection.local`, git-ignored). It is saved in `appsettings.Production.json` and kept
   on later deployments. The script refuses a connection string that names a `_dev` database.
+
+## Cookie consent
+
+Every page shows a cookie dialog until the visitor has accepted (`Pages/Shared/_CookieConsent.cshtml`, included at the end of
+`_Layout.cshtml`; styles `wwwroot/css/consent.css`, script `wwwroot/js/consent.js`, both loaded only while the dialog is needed).
+
+- **Blocking.** The dialog covers the page on a dark backdrop. The script makes everything behind it `inert`, so neither the mouse, the
+  keyboard nor a screen reader can reach the page, and puts the focus on the one button. Without script the backdrop still covers the page.
+- **Accepting.** The one button, "Accept and continue", posts to `/Consent` (`Pages/Consent.cshtml.cs`, anti-forgery checked), which
+  sets the cookie `cardtradebuddy.consent` (value = the version of the text, `ConsentCookie.Version`; one year; HttpOnly; Secure on
+  https; Lax) and goes back to the page the visitor was on. The return address must be a path on this site (anything else goes to `/`).
+  Raise `ConsentCookie.Version` to ask everybody again, for example when a cookie is added.
+- **The text** is in both languages, and the language flags are in the dialog too, so it can be read in either. A "Which cookies?"
+  list names every cookie: `cardtradebuddy.session` (login), `cardtradebuddy.antiforgery` (form protection), `.AspNetCore.Culture` (language),
+  `cardtradebuddy.email` (remember me), `.AspNetCore.Mvc.CookieTempDataProvider` (a one-time message to the next page),
+  `cardtradebuddy.consent`, and Cloudflare Turnstile's security cookie. **Add every new cookie to that list** (resource keys `ConsentCookie...`).
+- **There is no "decline" button.** All the cookies are needed for the site to work (there is no advertising or tracking). If analytics
+  or anything optional is ever added, the dialog must offer a real choice for those and only set them after a yes.
+- This is a gate in the page, not a block on the server: requests are not refused without the cookie.
 
 ## Front page design
 
@@ -669,6 +702,7 @@ Pages/
   Shared/_StartArtCheck.cshtml, _StartArtSwap.cshtml   The two pictures on the Start page
   Shared/_Hero.cshtml        Flags, title, tagline and the illustration (_HeroArtLogin, or _HeroArtRegister when a page sets ViewData["HeroArt"] = "register")
   Shared/_FormGuard.cshtml   The hidden trap field, time stamp and Turnstile widget inside the public forms
+  Shared/_CookieConsent.cshtml   The cookie dialog on every page until accepted (Consent.cshtml takes the accept post)
   Shared/_Turnstile.cshtml   The Cloudflare Turnstile widget
   Shared/_LoginSheet.cshtml  The login box
   Shared/_PasswordField.cshtml  A password field with the show/hide eye button

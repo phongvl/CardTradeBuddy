@@ -1,0 +1,43 @@
+@using CardTradeBuddy.Services
+@* The cookie dialog: on every page until the visitor has accepted. It covers the page and the script makes everything behind it inert,
+   so nothing else can be used first. The one button posts to /Consent, which remembers the choice and comes back to this page. *@
+@if (!ConsentCookie.Has(Context.Request))
+{
+    <link rel="stylesheet" href="~/css/consent.css" asp-append-version="true" />
+    <div id="cookie-consent" class="consent-backdrop">
+        <section class="consent" role="dialog" aria-modal="true" aria-labelledby="consent-title" aria-describedby="consent-text">
+            <div class="consent-top">
+                <svg class="consent-art" viewBox="0 0 64 64" aria-hidden="true">
+                    <circle cx="32" cy="32" r="27" fill="#E0A030" stroke="#B7791F" stroke-width="3" />
+                    <path d="M49 12 A12 12 0 0 0 58 24" fill="#FFF3D6" stroke="#B7791F" stroke-width="2" />
+                    <circle cx="22" cy="24" r="4" fill="#7A4A1D" /><circle cx="38" cy="20" r="3.2" fill="#7A4A1D" />
+                    <circle cx="30" cy="38" r="4.4" fill="#7A4A1D" /><circle cx="46" cy="40" r="3.6" fill="#7A4A1D" />
+                    <circle cx="19" cy="44" r="3" fill="#7A4A1D" />
+                </svg>
+                <partial name="_LanguageSwitch" />
+            </div>
+
+            <h2 id="consent-title">@T["ConsentTitle"]</h2>
+            <p id="consent-text">@T["ConsentText"]</p>
+
+            <details class="consent-details">
+                <summary>@T["ConsentDetails"]</summary>
+                <dl>
+                    <dt>cardtradebuddy.session</dt><dd>@T["ConsentCookieSession"]</dd>
+                    <dt>cardtradebuddy.antiforgery</dt><dd>@T["ConsentCookieAntiforgery"]</dd>
+                    <dt>.AspNetCore.Culture</dt><dd>@T["ConsentCookieLanguage"]</dd>
+                    <dt>cardtradebuddy.email</dt><dd>@T["ConsentCookieEmail"]</dd>
+                    <dt>.AspNetCore.Mvc.CookieTempDataProvider</dt><dd>@T["ConsentCookieTempData"]</dd>
+                    <dt>cardtradebuddy.consent</dt><dd>@T["ConsentCookieConsent"]</dd>
+                    <dt>Cloudflare Turnstile</dt><dd>@T["ConsentCookieTurnstile"]</dd>
+                </dl>
+            </details>
+
+            <form method="post" asp-page="/Consent">
+                <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                <button type="submit" class="consent-accept">@T["ConsentAccept"]</button>
+            </form>
+        </section>
+    </div>
+    <script src="~/js/consent.js" asp-append-version="true" defer></script>
+}

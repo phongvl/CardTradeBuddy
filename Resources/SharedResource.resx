@@ -142,5 +142,32 @@
   <data name="FinishQuestion" xml:space="preserve"><value>Which version do you have?</value></data>
   <data name="FinishRequired" xml:space="preserve"><value>Choose which version of the card you have.</value></data>
   <data name="AddedToAlbumFinish" xml:space="preserve"><value>Added to {0} as {1}.</value></data>
+  <data name="ConsentTitle" xml:space="preserve"><value>Cookies</value></data>
+  <data name="ConsentText" xml:space="preserve"><value>CardTradeBuddy uses only the cookies it needs to work: to keep you logged in, protect the forms and remember your language. There are no advertising or tracking cookies. To use the site you need to accept them.</value></data>
+  <data name="ConsentDetails" xml:space="preserve"><value>Which cookies?</value></data>
+  <data name="ConsentCookieSession" xml:space="preserve"><value>Keeps you logged in. It is gone when you close the browser, or after 30 days if you tick Remember me.</value></data>
+  <data name="ConsentCookieAntiforgery" xml:space="preserve"><value>Protects the forms against misuse.</value></data>
+  <data name="ConsentCookieLanguage" xml:space="preserve"><value>Remembers your language for a year.</value></data>
+  <data name="ConsentCookieEmail" xml:space="preserve"><value>Remembers your email address on the login form for 30 days, only if you tick Remember me.</value></data>
+  <data name="ConsentCookieTempData" xml:space="preserve"><value>Carries a short message to the next page, for example that your password was changed.</value></data>
+  <data name="ConsentCookieConsent" xml:space="preserve"><value>Remembers that you accepted the cookies, for a year.</value></data>
+  <data name="ConsentCookieTurnstile" xml:space="preserve"><value>The check that you are a person on the forms. Cloudflare may set a security cookie while it runs.</value></data>
+  <data name="ConsentAccept" xml:space="preserve"><value>Accept and continue</value></data>
+  <data name="DisclaimerTitle" xml:space="preserve"><value>Important notice before you continue</value></data>
+  <data name="DisclaimerIntro" xml:space="preserve"><value>CardTradeBuddy is a tool that helps collectors identify trading cards and estimate their value. Please read this notice carefully. You must accept it in order to create a user.</value></data>
+  <data name="DisclaimerH1" xml:space="preserve"><value>Information may be inaccurate</value></data>
+  <data name="DisclaimerP1" xml:space="preserve"><value>Card details, prices and estimates presented on this site are obtained from third-party sources and from automated recognition of photographs. They may be incomplete, outdated or incorrect. The service may misidentify a card, its set, its language or its finish (normal, holofoil or reverse holofoil).</value></data>
+  <data name="DisclaimerH2" xml:space="preserve"><value>Prices are estimates, not valuations</value></data>
+  <data name="DisclaimerP2" xml:space="preserve"><value>All prices are indicative only. The actual market value of a card depends on its condition, language, edition, grading, the marketplace and the time. Nothing on this site constitutes an appraisal, an offer to buy or sell, or financial advice.</value></data>
+  <data name="DisclaimerH3" xml:space="preserve"><value>Always verify the information</value></data>
+  <data name="DisclaimerP3" xml:space="preserve"><value>Before you buy, sell or trade a card, verify the card details and the price against several independent sources, such as established marketplaces and price guides, and against the card itself. You are solely responsible for your decisions.</value></data>
+  <data name="DisclaimerH4" xml:space="preserve"><value>No warranty and limitation of liability</value></data>
+  <data name="DisclaimerP4" xml:space="preserve"><value>The service is provided “as is” and “as available”, without warranties of any kind. To the fullest extent permitted by law, CardTradeBuddy and its operator accept no liability for any loss or damage arising from reliance on the information presented on this site.</value></data>
+  <data name="DisclaimerH5" xml:space="preserve"><value>No affiliation</value></data>
+  <data name="DisclaimerP5" xml:space="preserve"><value>CardTradeBuddy is an independent service. It is not affiliated with, endorsed by or sponsored by Nintendo, Creatures Inc., GAME FREAK inc., The Pokémon Company International or any marketplace whose data is shown. All trademarks belong to their respective owners.</value></data>
+  <data name="DisclaimerClosing" xml:space="preserve"><value>By selecting “I have read and accept”, you confirm that you have read and understood this notice.</value></data>
+  <data name="DisclaimerScrollHint" xml:space="preserve"><value>Scroll to the end of the notice to continue.</value></data>
+  <data name="DisclaimerAccept" xml:space="preserve"><value>I have read and accept</value></data>
+  <data name="DisclaimerRequired" xml:space="preserve"><value>You must read and accept the notice to create a user.</value></data>
 </root>
 

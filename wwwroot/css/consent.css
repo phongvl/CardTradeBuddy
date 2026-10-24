@@ -1,0 +1,159 @@
+/* The cookie dialog (see Pages/Shared/_CookieConsent.cshtml). Self-contained: it appears on every page, with or without home.css. */
+
+body.consent-open {
+    overflow: hidden;
+}
+
+.consent-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 12px;
+    background: rgba(31, 42, 68, 0.62);
+    overflow-y: auto;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #1f2a44;
+}
+
+.consent {
+    width: 100%;
+    max-width: 460px;
+    max-height: calc(100dvh - 24px);
+    overflow-y: auto;
+    box-sizing: border-box;
+    margin: auto;
+    padding: 18px 18px 20px;
+    border-radius: 24px;
+    background: #fff8e1;
+    box-shadow: 0 18px 50px rgba(31, 42, 68, 0.4);
+}
+
+.consent-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.consent-art {
+    width: 52px;
+    height: 52px;
+}
+
+/* The flags of the page behind may be pinned to the window's corner on wide screens: not here. */
+.consent .lang-switch {
+    position: static;
+    display: flex;
+    gap: 2px;
+    margin: 0 -8px 0 0;
+}
+
+.consent .lang {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+}
+
+.consent .lang svg {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px #fff;
+}
+
+.consent .lang.is-active svg {
+    box-shadow: 0 0 0 3px #2563eb;
+}
+
+.consent h2 {
+    margin: 8px 0 6px;
+    font-size: 22px;
+    line-height: 1.2;
+}
+
+.consent p {
+    margin: 0 0 12px;
+    font-size: 15px;
+    line-height: 1.45;
+}
+
+.consent-details {
+    margin: 0 0 14px;
+    font-size: 14px;
+}
+
+.consent-details summary {
+    display: inline-block;
+    padding: 6px 0;
+    font-weight: 600;
+    color: #1d4ed8;
+    cursor: pointer;
+}
+
+.consent-details dl {
+    margin: 6px 0 0;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.consent-details dt {
+    margin-top: 8px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.consent-details dt:first-child {
+    margin-top: 0;
+}
+
+.consent-details dd {
+    margin: 2px 0 0;
+    font-size: 13px;
+    line-height: 1.4;
+    color: #4b5563;
+}
+
+.consent-accept {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 50px;
+    box-sizing: border-box;
+    border: 2px solid #2563eb;
+    border-radius: 14px;
+    background: #2563eb;
+    color: #fff;
+    font: inherit;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.consent-accept:active {
+    background: #1d4ed8;
+}
+
+.consent-accept:focus-visible {
+    outline: 3px solid #1f2a44;
+    outline-offset: 2px;
+}
+
+@media (min-width: 560px) {
+    .consent-backdrop {
+        align-items: center;
+    }
+}

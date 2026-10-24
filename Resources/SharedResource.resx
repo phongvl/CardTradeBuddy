@@ -169,5 +169,50 @@
   <data name="DisclaimerScrollHint" xml:space="preserve"><value>Scroll to the end of the notice to continue.</value></data>
   <data name="DisclaimerAccept" xml:space="preserve"><value>I have read and accept</value></data>
   <data name="DisclaimerRequired" xml:space="preserve"><value>You must read and accept the notice to create a user.</value></data>
+  <data name="AlbumPriceChecked" xml:space="preserve"><value>Price checked {0}</value></data>
+  <data name="AlbumNoPrice" xml:space="preserve"><value>No price</value></data>
+  <data name="AlbumTotal" xml:space="preserve"><value>Total value</value></data>
+  <data name="AlbumTotalMissingOne" xml:space="preserve"><value>1 card without a price is not included.</value></data>
+  <data name="AlbumTotalMissingMany" xml:space="preserve"><value>{0} cards without a price are not included.</value></data>
+  <data name="DetailCategory" xml:space="preserve"><value>Category</value></data>
+  <data name="DetailStage" xml:space="preserve"><value>Stage</value></data>
+  <data name="DetailHp" xml:space="preserve"><value>HP</value></data>
+  <data name="DetailTypes" xml:space="preserve"><value>Type</value></data>
+  <data name="DetailRetreat" xml:space="preserve"><value>Retreat cost</value></data>
+  <data name="DetailIllustrator" xml:space="preserve"><value>Illustrator</value></data>
+  <data name="DetailLanguage" xml:space="preserve"><value>Language</value></data>
+  <data name="DetailAdded" xml:space="preserve"><value>Added to the album</value></data>
+  <data name="DetailCardId" xml:space="preserve"><value>Card id</value></data>
+  <data name="DetailPriceChecked" xml:space="preserve"><value>Price checked {0}</value></data>
+  <data name="DetailUpdate" xml:space="preserve"><value>Update card details and price</value></data>
+  <data name="DetailUpdating" xml:space="preserve"><value>Updating...</value></data>
+  <data name="DetailLoading" xml:space="preserve"><value>Loading...</value></data>
+  <data name="DetailClose" xml:space="preserve"><value>Close</value></data>
+  <data name="DetailUpdated" xml:space="preserve"><value>Updated with the latest details and price.</value></data>
+  <data name="DetailNotFound" xml:space="preserve"><value>The card list no longer has this card, so nothing was changed.</value></data>
+  <data name="DetailFailed" xml:space="preserve"><value>We could not reach the card list or the exchange rate. Nothing was changed. Try again in a moment.</value></data>
+  <data name="AlbumUpdateAll" xml:space="preserve"><value>Update all</value></data>
+  <data name="AlbumUpdating" xml:space="preserve"><value>Updating {0} of {1}...</value></data>
+  <data name="AlbumUpdateDone" xml:space="preserve"><value>Done. {0} cards looked at.</value></data>
+  <data name="AlbumUpdateSummary" xml:space="preserve"><value>{0} updated, {1} not found, {2} failed.</value></data>
+  <data name="FooterPrivacy" xml:space="preserve"><value>Privacy</value></data>
+  <data name="FooterCookies" xml:space="preserve"><value>Cookies</value></data>
+  <data name="PrivacyTitle" xml:space="preserve"><value>Privacy policy</value></data>
+  <data name="CookiesTitle" xml:space="preserve"><value>Cookie policy</value></data>
+  <data name="DocUpdated" xml:space="preserve"><value>Last updated {0}</value></data>
+  <data name="DocBack" xml:space="preserve"><value>Back to the site</value></data>
+  <data name="ConsentReadMore" xml:space="preserve"><value>Read more:</value></data>
+  <data name="CookiesIntro" xml:space="preserve"><value>Cookies are small text files that a website stores in your browser. CardTradeBuddy uses only the cookies it needs to work. We do not use advertising, tracking or analytics cookies, and we do not share cookie data with advertisers.</value></data>
+  <data name="CookiesTableHeading" xml:space="preserve"><value>The cookies we use</value></data>
+  <data name="CookiesColName" xml:space="preserve"><value>Cookie</value></data>
+  <data name="CookiesColPurpose" xml:space="preserve"><value>What it is for</value></data>
+  <data name="CookiesAllNecessary" xml:space="preserve"><value>All of these cookies are strictly necessary for the site to work, which is why you cannot decline them. You are asked to accept them once, and your acceptance is remembered in the cookie cardtradebuddy.consent.</value></data>
+  <data name="CookiesOthersTitle" xml:space="preserve"><value>Requests to other companies</value></data>
+  <data name="CookiesOthersText" xml:space="preserve"><value>The check that you are a person on the forms comes from Cloudflare (Turnstile), which may set a security cookie while it runs. Card pictures and set logos are loaded straight from the card list’s servers (tcgdex.net): your browser contacts them, so they receive your IP address and browser details like any website you visit. We do not control the cookies these companies may set.</value></data>
+  <data name="CookiesManageTitle" xml:space="preserve"><value>Managing and deleting cookies</value></data>
+  <data name="CookiesManageText" xml:space="preserve"><value>You can delete cookies in your browser’s settings at any time. If you do, you will be logged out and asked to accept the cookies again. If you block them, the site cannot work.</value></data>
+  <data name="CookiesChangesTitle" xml:space="preserve"><value>Changes</value></data>
+  <data name="CookiesChangesText" xml:space="preserve"><value>If we ever add cookies that are not strictly necessary, we will ask for your choice before they are set, and update this page.</value></data>
+  <data name="CookiesSeePrivacy" xml:space="preserve"><value>For how we handle personal data, see the</value></data>
 </root>
 

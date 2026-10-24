@@ -102,6 +102,10 @@ namespace CardTradeBuddy.Data.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
+                    b.Property<string>("Language")
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)");
+
                     b.Property<string>("LocalId")
                         .IsRequired()
                         .HasMaxLength(32)

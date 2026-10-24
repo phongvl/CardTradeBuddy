@@ -23,10 +23,11 @@ ASP.NET Core Razor Pages on .NET 10. Hosted on Windows with IIS.
 12. [Languages](#languages)
 13. [Database (preferences)](#database-preferences)
 14. [Cookie consent](#cookie-consent)
-15. [Front page design](#front-page-design)
+15. [Privacy and cookie pages](#privacy-and-cookie-pages)
+16. [Front page design](#front-page-design)
     - [Start page](#start-page)
-16. [Project layout](#project-layout)
-17. [Known limits](#known-limits)
+17. [Project layout](#project-layout)
+18. [Known limits](#known-limits)
 
 ## Status
 
@@ -69,12 +70,14 @@ dotnet run
 | `Login:ClientSecret` | (none) | The app's secret in the LoginServer. **Never in the repo:** `appsettings.Development.local.json` (git-ignored) in development, `appsettings.Production.json` on the server. |
 | `Login:VerifyEmail` | `false` | `true`: new users must click a link in an email before they can log in. Needs the app's email sender set up in the LoginServer. |
 | `ConnectionStrings:Default` | (none) | The PostgreSQL database for per-user preferences (see [Database](#database-preferences)). **Never in the repo**, like the login secret. Without it the site works, but preferences are not saved. |
+| `Site:OperatorName`, `Site:ContactEmail` | (empty) | Who runs the site and how to reach them, shown in the privacy policy. Set both before the site is public. |
 | `Account:MinimumAge` | `13` | The youngest age that may create a user (checked against the birthday given at sign-up). |
 | `Turnstile:SiteKey` | (none) | Cloudflare Turnstile's public key (goes in the page). With `Turnstile:SecretKey` it switches the check on. |
 | `Turnstile:SecretKey` | (none) | Turnstile's private key, used to check the visitor's answer with Cloudflare. **Never in the repo**, like the other secrets. |
 | `Network:BehindCloudflare` | `false` | `true`: trust Cloudflare's `CF-Connecting-IP` header as the visitor's address (for the rate limit). Only set it if the site really is behind Cloudflare. |
 | `RateLimit:AuthPerMinute` | `10` | Requests per minute from one address to the login and account pages. |
 | `RateLimit:ScanPerMinute` | `12` | Requests per minute from one logged-in user to the Check a card page. |
+| `RateLimit:AlbumPerMinute` | `90` | Requests per minute from one logged-in user to the album page (including the popups and "update all"). |
 | `Album:PageSize` | `50` | How many cards the album page shows per page (1 to 200). |
 | `Check:Model` | `qwen3-vl:8b` | The Ollama model the Check page uses to read cards. |
 
@@ -536,6 +539,7 @@ Users created before the birthday was asked for have no `user_profiles` row.
 | `FinishAssumed` | `boolean` | Always false now (the user chooses the finish); kept for cards saved while the finish was still guessed from the photo. |
 | `EstimatedPriceEur` | `numeric(12,2)` | The calculated price in EUR for `Finish`, null when there was none. |
 | `Pricing` | `jsonb` | Every marketplace figure TCGdex had (Cardmarket EUR, TCGplayer USD), as received (`CardPricing`). |
+| `Language` | `varchar(8)`, null | The language the card was found in (`EN`, `DE`, `JA`, ...), so an update looks for it in the same language. Null = English. |
 | `PricesCheckedAt` | `timestamptz` | **When the price was last looked up.** A later price refresh should update `Pricing`, `EstimatedPriceEur` and this. |
 
 Owning two copies of a card means two rows. A user has albums through `albums.UserId`; `cards` has no user column of its own.
@@ -572,9 +576,28 @@ Every page shows a cookie dialog until the visitor has accepted (`Pages/Shared/_
   list names every cookie: `cardtradebuddy.session` (login), `cardtradebuddy.antiforgery` (form protection), `.AspNetCore.Culture` (language),
   `cardtradebuddy.email` (remember me), `.AspNetCore.Mvc.CookieTempDataProvider` (a one-time message to the next page),
   `cardtradebuddy.consent`, and Cloudflare Turnstile's security cookie. **Add every new cookie to that list** (resource keys `ConsentCookie...`).
+- **One list of cookies.** `Services/CookieList.cs` is the single list behind the dialog and the cookie policy page. **When a cookie is added,
+  changed or removed, change that list (and the `ConsentCookie...` description in both resource files) and raise `ConsentCookie.Version`.**
+- **Policy pages.** The dialog links to the cookie and privacy policies, and those two pages do not show the dialog (`ViewData["NoConsentGate"]`), so they can be read
+  before accepting. See [Privacy and cookie pages](#privacy-and-cookie-pages).
 - **There is no "decline" button.** All the cookies are needed for the site to work (there is no advertising or tracking). If analytics
   or anything optional is ever added, the dialog must offer a real choice for those and only set them after a yes.
 - This is a gate in the page, not a block on the server: requests are not refused without the cookie.
+
+## Privacy and cookie pages
+
+- **Footer.** Every page ends with the links **Privacy** and **Cookies** (`Pages/Shared/_Footer.cshtml`, included by `_Layout.cshtml`; styles in `site.css`). The pages that fill the
+  screen (front page, Start, Check) are one footer high less (`--footer-h` in `home.css`), so on a phone the footer is on screen without scrolling.
+- **Cookie policy** (`/Cookies`, `Pages/Cookies.cshtml`): what cookies are, the table of every cookie from `CookieList` with what it does and how long it lasts, that all are
+  strictly necessary (no advertising, tracking or analytics), requests to Cloudflare (Turnstile) and the card list's image servers, how to delete cookies, and what happens if
+  other cookies are added. Texts are resource keys (`Cookies...`), English and Danish.
+- **Privacy policy** (`/Privacy`, `Pages/Privacy.cshtml`; the text is in `Pages/Shared/_PrivacyEn.cshtml` and `_PrivacyDa.cshtml`, one file per language): who is responsible, what data is
+  handled and why (account, birthday, the accepted disclaimer, language, albums and cards, photos that are only read in memory and never stored, IP address and logs, service emails),
+  cookies, who receives data (Resend, Cloudflare, TCGdex, Frankfurter), how long it is kept, the user's rights and the Danish Data Protection Agency, children (the minimum age
+  from `Account:MinimumAge`), security, changes. **When what the site does with personal data changes, change both language files and `PrivacyModel.Updated`.**
+- **Who runs the site.** The policy names the operator and a contact address from the settings `Site:OperatorName` and `Site:ContactEmail` in `appsettings.json` (both empty at first:
+  fill them in, or the page only says "its owner"). Without a contact address the page has no way to reach you: set it before the site is public.
+- Both pages are for everybody (no login) and are written as plain-language information, **not legal advice**: have them checked, especially the privacy policy, before relying on them.
 
 ## Front page design
 
@@ -676,13 +699,39 @@ that is not the user's). The header has the language flags on the left (like the
 - **Version icon.** Each thumbnail has a small icon in its bottom-right corner showing which version the user said they have: normal,
   holofoil or reverse holofoil (the same icons as in the "which version" choice, `_FinishSprite`), with the name as tooltip and screen
   reader text. Cards saved before the version was chosen (finish unknown) have no icon.
+- **Price.** Under each name is the card's saved estimated price (the price for the version the user chose, in kroner on a Danish page and
+  in euros otherwise, as on the Check page), or a dash when there was no price data. Hovering shows when the price was checked
+  (`PricesCheckedAt`). The names always take two lines of room so the prices line up along a row. The prices are the ones saved when the
+  card was added; they do not refresh by themselves yet.
+- **Total value.** At the bottom right of the panel, under the cards and the page links: the estimated prices of **all** the cards in the
+  album added up (not only the page shown), in kroner on a Danish page and in euros otherwise. Cards without a price count as nothing,
+  and a note says how many they are. Worked out in the database (`AlbumService.GetPageAsync`: a sum and a count over the album).
 - **Empty slots.** The last row is filled up with empty, dashed card slots (`wwwroot/js/album.js`), so an album with few cards does not look
   bare. The script reads the real number of columns, which depends on the screen, and redoes the slots when the window changes size.
 - **Paging.** `Album:PageSize` cards per page (50 by default, kept between 1 and 200); `?p=2` is the page. Below the cards: Previous, the
   first, last and nearby page numbers, Next. A page number that is too high goes to the last page, a bad one to page 1.
 - **Empty.** Without cards it says so and offers "Check a card". Looking never creates an album: the default album is created when the
   first card is added.
-- **Not yet:** the cards are not clickable. Showing a card's details comes later.
+- **Card popup.** A thumbnail is a button: clicking it opens a popup (`<dialog id="card-dialog">`, filled from `/Album?handler=Card`,
+  `Pages/Shared/_AlbumCardDetail.cshtml`) with everything saved about the card: the big picture, the set and its logo, number, rarity,
+  category, stage, HP, type, retreat cost, illustrator, language, the version (with its icon), when it was added, the TCGdex id, the
+  description, and the estimated price for the chosen version with the time it was checked (in the page's currency). The marketplace
+  figures (Cardmarket, TCGplayer) are saved with the card (`cards.Pricing`) but not shown, to keep the popup short. A round close icon sits in
+  the top right corner (and a Close button at the bottom, and the backdrop and Escape also close it). It only opens cards of the logged-in user.
+- **Update card.** The popup's **Update card details and price** button looks the card up again and saves the latest. **Update all**
+  (top right of the album, next to the card count) does the same for every card in the album: the page asks the server for six cards at
+  a time (three looked up in parallel), shows "Updating 12 of 120..." with a progress bar, then a summary ("2 updated, 2 not found,
+  0 failed") and reloads to show the new prices and the new total. Closing a popup after an update also reloads the list.
+  - **How the card is found again** (`AlbumService.RefreshCardAsync`): by the saved **name and number** (`ICardDataProvider`, the same
+    `TcgDexCardDataProvider` as when the card was checked, not the photo), in the card's saved **language** (`cards.Language`; null =
+    English), with the set's card total (`SetOfficialCardCount`) to pick the right set when the name and number exist in several.
+  - **Safe:** the card is only changed when the lookup returns **the same TCGdex id** as the saved card. Another card with the same
+    name and number, or none (the card list dropped it), leaves the saved card untouched and counts as "not found". If the card list or
+    the exchange rate cannot be reached nothing is changed either ("failed").
+  - **What changes:** all the card details and the marketplace prices; the **chosen version stays**, and the estimated price is
+    recalculated for it (`PriceCalculator`); `PricesCheckedAt` is set to now. The user's version, album and when it was added are kept.
+  - The album page has its own rate limit, `RateLimit:AlbumPerMinute` (90 requests a minute per user: page views, popups and the
+    update batches).
 - Reading is `AlbumService.GetPageAsync`: it fetches only id, name and picture address, so the price data is not loaded for a list.
 
 ## Project layout
@@ -703,6 +752,8 @@ Pages/
   Shared/_Hero.cshtml        Flags, title, tagline and the illustration (_HeroArtLogin, or _HeroArtRegister when a page sets ViewData["HeroArt"] = "register")
   Shared/_FormGuard.cshtml   The hidden trap field, time stamp and Turnstile widget inside the public forms
   Shared/_CookieConsent.cshtml   The cookie dialog on every page until accepted (Consent.cshtml takes the accept post)
+  Shared/_Footer.cshtml      Privacy and Cookies links at the bottom of every page
+  Privacy.cshtml, Cookies.cshtml   The privacy policy (text in Shared/_PrivacyEn/_PrivacyDa) and the cookie policy (table from Services/CookieList.cs)
   Shared/_Turnstile.cshtml   The Cloudflare Turnstile widget
   Shared/_LoginSheet.cshtml  The login box
   Shared/_PasswordField.cshtml  A password field with the show/hide eye button

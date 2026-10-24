@@ -70,7 +70,9 @@ Scripts/deploy.ps1  IIS deploy; wwwroot/css/home.css  all front page styles; www
   ("Coming soon", no page yet). Pictures are inline SVG partials; phone must fit both halves on one screen. `/ProtoUpload` is the old
   developer test page: keep it as it is.
 - **Saved cards icon** in the header of Start and Check (`_SavedCardsIcon`, logged-in only) opens `/Album`: the default album as small thumbnails with names,
-  paged (`Album:PageSize`, 50). Cards are not clickable yet (card details come later); no way to choose another album yet.
+  paged (`Album:PageSize`, 50). Clicking a card opens a popup with all its data and an **Update** button; **Update all** refreshes the album in batches. Refresh = `AlbumService.RefreshCardAsync`:
+  looks the card up again by saved **name + localId** (+ language, set total) through `TcgDexCardDataProvider`, and only overwrites when the result has the **same TCGdex id**;
+  keeps the chosen finish and recalculates its price. No way to choose another album yet.
 - **Check page** (`/Check`): take/upload a photo (`wwwroot/js/check.js`: full-screen camera with a card outline that turns green
   when a card sits in it (`card-frame.js`) and crops to the outline; native camera app as a fallback on phones; drag and drop; shrink
   to 2400 px), preview, then `CardChecker` reads the card with Ollama + TCGdex and shows card and price (kroner when Danish).
@@ -81,6 +83,9 @@ Scripts/deploy.ps1  IIS deploy; wwwroot/css/home.css  all front page styles; www
 - **Cookie consent:** every page (via `_Layout`) shows a blocking dialog until `cardtradebuddy.consent` is set (`/Consent` post). All cookies are
   essential, so there is no decline button. **A new cookie must be added to the dialog's list** (and `ConsentCookie.Version` raised). To test as a
   fresh visitor use `http://127.0.0.1:5301` (its cookies are separate from `localhost`).
+- **Privacy and cookie pages** (`/Privacy`, `/Cookies`, linked in the footer of every page, readable before the cookie dialog is accepted). The cookie list is ONE place
+  (`Services/CookieList.cs`, used by the dialog and the page): add every new cookie there. Privacy text is `_PrivacyEn/_PrivacyDa.cshtml`: keep both in step with what the site really does
+  with personal data. Operator and contact come from `Site:OperatorName` / `Site:ContactEmail` (empty until the owner fills them in). Not legal advice.
 - **Create user:** the "Create user" button opens a disclaimer popup (prices/information may be inaccurate, always verify; read to the end, then accept);
   the server refuses a sign-up without `DisclaimerAccepted=true` and stores `DisclaimerAcceptedAt`/`DisclaimerVersion` in `user_profiles`
   (`Disclaimer.Version`). Birthday required, minimum age `Account:MinimumAge` (13). Saved in `user_profiles` only for a brand-new account.

@@ -9,6 +9,7 @@
 </head>
 <body class="@ViewData["BodyClass"]">
     @RenderBody()
+    <partial name="_Footer" />
     @await RenderSectionAsync("Scripts", required: false)
     <partial name="_CookieConsent" />
 </body>

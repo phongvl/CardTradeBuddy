@@ -50,6 +50,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(x => x.CardId).HasMaxLength(64);
             e.Property(x => x.LocalId).HasMaxLength(32);
             e.Property(x => x.Name).HasMaxLength(200);
+            e.Property(x => x.Language).HasMaxLength(8);
             e.Property(x => x.Category).HasMaxLength(64);
             e.Property(x => x.Rarity).HasMaxLength(64);
             e.Property(x => x.Illustrator).HasMaxLength(200);

@@ -3,3 +3,26 @@
     margin: 2rem;
 }
 
+
+/* The links at the bottom of every page (Pages/Shared/_Footer.cshtml). */
+.site-footer {
+    padding: 8px 12px 14px;
+    text-align: center;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 13px;
+    line-height: 1.4;
+    color: #6b7280;
+}
+
+.site-footer a {
+    display: inline-block;
+    padding: 6px 8px;
+    color: #4b5563;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.site-footer a:hover,
+.site-footer a:focus-visible {
+    color: #1d4ed8;
+}

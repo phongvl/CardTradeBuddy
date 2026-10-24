@@ -1,0 +1,65 @@
+@model CardTradeBuddy.Pages.PrivacyModel
+@* The privacy policy in English. Keep it in step with _PrivacyDa.cshtml and with what the site really does. *@
+
+<p>This policy explains what personal data CardTradeBuddy handles, why, for how long, who receives it and what rights you have. CardTradeBuddy
+helps collectors identify trading cards and estimate their value.</p>
+
+<h2>1. Who is responsible</h2>
+@if (!string.IsNullOrWhiteSpace(Model.OperatorName) || !string.IsNullOrWhiteSpace(Model.ContactEmail))
+{
+    <p>
+        @if (!string.IsNullOrWhiteSpace(Model.OperatorName)) { <text>CardTradeBuddy is operated by <strong>@Model.OperatorName</strong>, who is the controller of your personal data.</text> }
+        @if (!string.IsNullOrWhiteSpace(Model.ContactEmail)) { <text> Questions and requests about your data: <a href="mailto:@Model.ContactEmail">@Model.ContactEmail</a>.</text> }
+    </p>
+}
+else
+{
+    <p>CardTradeBuddy is operated by its owner, who is the controller of your personal data.</p>
+}
+
+<h2>2. What data we handle, and why</h2>
+<ul>
+    <li><strong>Your account.</strong> Your email address and password are used to create your user and to log you in. The password is checked by our separate login service
+        (secure.phong.dk), which stores only a scrambled form of it (a hash) and never the password itself. Basis: performing the agreement to give you a user.</li>
+    <li><strong>Your birthday.</strong> You give it when you create a user, so we can check that you are old enough (at least @Model.MinimumAge years). It is stored with your user and is
+        never shown to anyone. Basis: our legal and safety interest in not offering the service to children below that age.</li>
+    <li><strong>Your acceptance of the notice about prices and information.</strong> We save when you accepted it and which version of the text, as evidence that you did.</li>
+    <li><strong>Your settings.</strong> Your preferred language is saved so that the site looks the same the next time you log in.</li>
+    <li><strong>Your albums and cards.</strong> The cards you add, which version you said you have, their prices and when the prices were checked.</li>
+    <li><strong>Photos of cards.</strong> A photo you take or upload is read in memory by an image-reading model running on our own server, to find out which card it is. The photo is
+        <strong>not stored</strong>, not kept in a log and not sent to any outside AI service. Only the card's name and number are sent on to the card list (see section 4).</li>
+    <li><strong>Technical and security data.</strong> Your IP address is used while you use the site to limit abuse (for example too many login attempts). Our server also keeps a log of
+        login attempts (email address, time and whether it worked) and of errors. Basis: our legitimate interest in keeping the service secure.</li>
+    <li><strong>Emails.</strong> We send an email when you reset your password or, if switched on, to confirm your email address. Only these service emails are sent, never advertising.</li>
+</ul>
+
+<h2>3. Cookies</h2>
+<p>We use only the cookies the site needs to work. We do not use advertising, tracking or analytics cookies. See the <a asp-page="/Cookies">cookie policy</a> for the list.</p>
+
+<h2>4. Who we share data with</h2>
+<p>We do not sell your data, and we do not use it for advertising. Some companies handle data for us or receive requests when you use the site:</p>
+<ul>
+    <li><strong>Resend</strong> (email delivery): your email address and the content of the service email.</li>
+    <li><strong>Cloudflare</strong> (the "are you a person" check on forms, Turnstile): technical data such as your IP address and browser details, to tell people from automated programs.</li>
+    <li><strong>TCGdex</strong> (the card list, tcgdex.net): we send the name and number of a card to look it up. Card pictures are loaded straight from their servers, so they see your IP address like any website you visit.</li>
+    <li><strong>Frankfurter</strong> (exchange rates): no personal data is sent.</li>
+</ul>
+<p>Some of these companies are outside the EU/EEA. Where that is the case, the transfer is based on the safeguards the law requires, such as an adequacy decision or standard contractual clauses.</p>
+
+<h2>5. How long we keep it</h2>
+<p>Your account data, albums and cards are kept for as long as you have a user. Photos are never kept. Log entries are kept only as long as needed to keep the service secure and
+running, and are then overwritten or deleted. There is no button to delete your user yet: to have your user and everything saved with it deleted, contact us (see section 1).</p>
+
+<h2>6. Your rights</h2>
+<p>You have the right to ask for access to the data we hold about you, to have it corrected or deleted, to restrict or object to how it is used, and to receive it in a portable form.
+Contact us to use these rights. You can also complain to the Danish Data Protection Agency (Datatilsynet, <a href="https://www.datatilsynet.dk" rel="noopener">datatilsynet.dk</a>).</p>
+
+<h2>7. Children</h2>
+<p>CardTradeBuddy is for people who are at least @Model.MinimumAge years old. If we learn that a user is younger, we delete the user.</p>
+
+<h2>8. Security</h2>
+<p>The site is served over an encrypted connection (HTTPS), passwords are never stored in readable form, forms are protected against misuse, and access to your albums is limited to you.
+No system is completely secure, so we cannot promise absolute security.</p>
+
+<h2>9. Changes</h2>
+<p>If we change what we do with data, we update this page and its date. For major changes we will tell you in the service.</p>

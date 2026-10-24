@@ -28,6 +28,10 @@ public class Card
     public string LocalId { get; set; } = "";
 
     public string Name { get; set; } = "";
+
+    /// <summary>The language the card was found in ("EN", "DE", "JA", ...), so a refresh looks for it by name in the same language. Null on cards saved before this existed (treated as English).</summary>
+    public string? Language { get; set; }
+
     public string? Category { get; set; }
     public string? Rarity { get; set; }
     public string? Illustrator { get; set; }

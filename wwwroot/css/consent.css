@@ -126,6 +126,16 @@ body.consent-open {
     color: #4b5563;
 }
 
+.consent-links {
+    margin: 0 0 12px;
+    font-size: 13px;
+}
+
+.consent-links a {
+    color: #1d4ed8;
+    font-weight: 600;
+}
+
 .consent-accept {
     display: flex;
     align-items: center;

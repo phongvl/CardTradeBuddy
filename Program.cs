@@ -72,6 +72,7 @@ builder.Services.AddAntiforgery(options =>
 // login and account pages from one address, 10 by default. (The LoginServer also locks an account after repeated failures.)
 var authRequestsPerMinute = builder.Configuration.GetValue("RateLimit:AuthPerMinute", 10);
 var scanRequestsPerMinute = builder.Configuration.GetValue("RateLimit:ScanPerMinute", 12);
+var albumRequestsPerMinute = builder.Configuration.GetValue("RateLimit:AlbumPerMinute", 90);
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -83,6 +84,11 @@ builder.Services.AddRateLimiter(options =>
     options.AddPolicy("scan", context => RateLimitPartition.GetFixedWindowLimiter(
         context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? ClientIp.Get(context) ?? "unknown",
         _ => new FixedWindowRateLimiterOptions { PermitLimit = scanRequestsPerMinute, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
+
+    // The album page (page views, card popups and the "update all" batches that call the card list): per logged-in user, RateLimit:AlbumPerMinute a minute, 90 by default.
+    options.AddPolicy("album", context => RateLimitPartition.GetFixedWindowLimiter(
+        context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? ClientIp.Get(context) ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = albumRequestsPerMinute, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
 });
 builder.Services.AddHttpClient<ILlmService, OllamaLlmService>(client =>
 {

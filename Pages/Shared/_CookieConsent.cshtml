@@ -1,7 +1,7 @@
 @using CardTradeBuddy.Services
-@* The cookie dialog: on every page until the visitor has accepted. It covers the page and the script makes everything behind it inert,
+@* The cookie dialog: on every page (except the cookie and privacy policies, which must be readable first) until the visitor has accepted. It covers the page and the script makes everything behind it inert,
    so nothing else can be used first. The one button posts to /Consent, which remembers the choice and comes back to this page. *@
-@if (!ConsentCookie.Has(Context.Request))
+@if (!ConsentCookie.Has(Context.Request) && ViewData["NoConsentGate"] is not true)
 {
     <link rel="stylesheet" href="~/css/consent.css" asp-append-version="true" />
     <div id="cookie-consent" class="consent-backdrop">
@@ -23,15 +23,14 @@
             <details class="consent-details">
                 <summary>@T["ConsentDetails"]</summary>
                 <dl>
-                    <dt>cardtradebuddy.session</dt><dd>@T["ConsentCookieSession"]</dd>
-                    <dt>cardtradebuddy.antiforgery</dt><dd>@T["ConsentCookieAntiforgery"]</dd>
-                    <dt>.AspNetCore.Culture</dt><dd>@T["ConsentCookieLanguage"]</dd>
-                    <dt>cardtradebuddy.email</dt><dd>@T["ConsentCookieEmail"]</dd>
-                    <dt>.AspNetCore.Mvc.CookieTempDataProvider</dt><dd>@T["ConsentCookieTempData"]</dd>
-                    <dt>cardtradebuddy.consent</dt><dd>@T["ConsentCookieConsent"]</dd>
-                    <dt>Cloudflare Turnstile</dt><dd>@T["ConsentCookieTurnstile"]</dd>
+                    @foreach (var cookie in CookieList.All)
+                    {
+                        <dt>@cookie.Name</dt><dd>@T[cookie.DescriptionKey]</dd>
+                    }
                 </dl>
             </details>
+
+            <p class="consent-links">@T["ConsentReadMore"] <a asp-page="/Cookies">@T["CookiesTitle"]</a> &middot; <a asp-page="/Privacy">@T["PrivacyTitle"]</a></p>
 
             <form method="post" asp-page="/Consent">
                 <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />

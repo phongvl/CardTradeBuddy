@@ -1,6 +1,8 @@
+using System.Globalization;
 using CardTradeBuddy.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Localization;
 
 namespace CardTradeBuddy.Pages;
@@ -10,7 +12,8 @@ namespace CardTradeBuddy.Pages;
 /// shown (the <c>album</c> address value is ready for "choose an album", there is no way to choose yet). The cards are not clickable
 /// yet: showing a card's details comes later.
 /// </summary>
-public class AlbumModel(AlbumService albums, IConfiguration configuration, IStringLocalizer<SharedResource> localizer) : PageModel
+[EnableRateLimiting("album")]
+public class AlbumModel(AlbumService albums, IExchangeRateService rates, IConfiguration configuration, IStringLocalizer<SharedResource> localizer) : PageModel
 {
     /// <summary>Cards per page when <c>Album:PageSize</c> is not set.</summary>
     public const int DefaultPageSize = 50;
@@ -33,6 +36,14 @@ public class AlbumModel(AlbumService albums, IConfiguration configuration, IStri
     public int TotalPages { get; private set; } = 1;
 
     public IReadOnlyList<AlbumCardItem> Cards { get; private set; } = [];
+
+    /// <summary>The estimated value of the whole album in euros (all pages), and how many cards have no price and are left out of it.</summary>
+    public decimal TotalValueEur { get; private set; }
+
+    public int CardsWithoutPrice { get; private set; }
+
+    /// <summary>Danish kroner per euro when the page is Danish and the rate was available; null means prices are shown in euros.</summary>
+    public decimal? EurToDkk { get; private set; }
 
     /// <summary>The page numbers to link to: the first, the last and the ones around the current page; null is a gap ("...").</summary>
     public IReadOnlyList<int?> PageLinks { get; private set; } = [];
@@ -57,9 +68,59 @@ public class AlbumModel(AlbumService albums, IConfiguration configuration, IStri
 
         Title = page.Album is null || page.Album.IsDefault ? localizer["DefaultAlbumName"].Value : page.Album.Name;
         Cards = page.Cards;
+        TotalValueEur = page.TotalValueEur;
+        CardsWithoutPrice = page.CardsWithoutPrice;
         PageLinks = BuildPageLinks(PageNumber, TotalPages);
+
+        // Danish page: prices in kroner (they are saved in euros).
+        if (Cards.Count > 0 && CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "da")
+            EurToDkk = await rates.GetEurToDkkAsync(cancellationToken);
+
         return Page();
     }
+
+    /// <summary>The popup of one card (the page asks for it when a thumbnail is clicked): everything saved about the card.</summary>
+    public async Task<IActionResult> OnGetCardAsync(Guid id, CancellationToken cancellationToken)
+    {
+        if (UserPreferences.UserId(User) is not { } userId) return Challenge();
+        var card = await albums.GetCardAsync(userId, id, cancellationToken);
+        return card is null ? NotFound() : await DetailAsync(card, null, false, cancellationToken);
+    }
+
+    /// <summary>"Update card": looks this card up again by its name and number and saves the latest details and price. Answers with the new popup.</summary>
+    public async Task<IActionResult> OnPostRefreshCardAsync(Guid id, CancellationToken cancellationToken)
+    {
+        if (UserPreferences.UserId(User) is not { } userId) return Challenge();
+        var card = await albums.GetCardAsync(userId, id, cancellationToken);
+        if (card is null) return NotFound();
+
+        var outcome = await albums.RefreshCardAsync(card, cancellationToken);
+        var message = outcome switch
+        {
+            RefreshOutcome.Updated => localizer["DetailUpdated"].Value,
+            RefreshOutcome.NotFound => localizer["DetailNotFound"].Value,
+            _ => localizer["DetailFailed"].Value,
+        };
+        return await DetailAsync(card, message, outcome != RefreshOutcome.Updated, cancellationToken);
+    }
+
+    /// <summary>"Update all": one batch of the album's cards (the page calls this again and again with the next <c>skip</c>, and shows the progress).</summary>
+    public async Task<IActionResult> OnPostRefreshAllAsync(Guid? album, int skip, int take, CancellationToken cancellationToken)
+    {
+        if (UserPreferences.UserId(User) is not { } userId) return Challenge();
+        var batch = await albums.RefreshBatchAsync(userId, album, skip, take, cancellationToken);
+        return batch is null ? NotFound() : new JsonResult(batch);
+    }
+
+    private async Task<IActionResult> DetailAsync(Data.Card card, string? message, bool isError, CancellationToken cancellationToken)
+    {
+        // Danish page: the price in kroner.
+        var kroner = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "da" ? await rates.GetEurToDkkAsync(cancellationToken) : null;
+        return Partial("_AlbumCardDetail", new AlbumCardDetail(card, kroner, message, isError));
+    }
+
+    /// <summary>A card's saved price (in euros) written in the page's currency: "12,34 kr." in Danish, "€12.34" otherwise.</summary>
+    public string Money(decimal eur) => CardChecker.FormatMoney(eur, EurToDkk);
 
     /// <summary>The display name of a finish (for the tooltip and the screen reader text of the finish icon).</summary>
     public string FinishName(CardFinish finish) => finish switch

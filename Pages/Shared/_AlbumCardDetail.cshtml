@@ -1,0 +1,74 @@
+@model CardTradeBuddy.Pages.AlbumCardDetail
+@using System.Globalization
+@using CardTradeBuddy.Services
+@* The popup of one card on the album page: everything saved about the card, its price, and a button that looks the card up again.
+   Loaded when a thumbnail is clicked (/Album?handler=Card) and again after an update. *@
+@{
+    var c = Model.Card;
+    var finishName = c.Finish switch
+    {
+        CardFinish.Holofoil => T["ResFinishHolo"].Value,
+        CardFinish.ReverseHolofoil => T["ResFinishReverse"].Value,
+        _ => T["ResFinishNormal"].Value,
+    };
+    string Local(DateTime utc) => DateTime.SpecifyKind(utc, DateTimeKind.Utc).ToLocalTime().ToString("g", CultureInfo.CurrentCulture);
+}
+<div class="detail" data-card-id="@c.Id">
+    <div class="detail-head">
+        @if (c.ImageUrl is not null)
+        {
+            <img class="detail-image" src="@c.ImageUrl" alt="" />
+        }
+        <div class="detail-title">
+            <h3 id="card-dialog-title">@c.Name</h3>
+            @if (c.SetLogoUrl is not null)
+            {
+                <img class="detail-setlogo" src="@c.SetLogoUrl" alt="" />
+            }
+            <p class="detail-set">@c.SetName</p>
+            <p class="detail-version">
+                @if (c.Finish is CardFinish.Normal or CardFinish.Holofoil or CardFinish.ReverseHolofoil)
+                {
+                    <svg viewBox="0 0 30 42" aria-hidden="true"><use href="#finish-@c.Finish.ToString().ToLowerInvariant()" /></svg>
+                }
+                <span>@finishName</span>
+            </p>
+        </div>
+    </div>
+
+    @if (Model.Message is not null)
+    {
+        <p class="message @(Model.MessageIsError ? "error" : "notice")" role="@(Model.MessageIsError ? "alert" : "status")">@Model.Message</p>
+    }
+
+    <div class="detail-price">
+        <span class="detail-price-label">@T["ResPrice"] (@finishName)</span>
+        <strong class="detail-price-amount">@(c.EstimatedPriceEur is { } eur ? Model.Money(eur) : "–")</strong>
+        <span class="detail-price-checked">@T["DetailPriceChecked", Local(c.PricesCheckedAt)]</span>
+    </div>
+
+    <dl class="detail-facts">
+        <div><dt>@T["ResSet"]</dt><dd>@c.SetName (@c.SetId)</dd></div>
+        <div><dt>@T["ResNumber"]</dt><dd>@c.LocalId@(c.SetOfficialCardCount is { } total ? $"/{total}" : "")</dd></div>
+        <div><dt>@T["ResRarity"]</dt><dd>@(c.Rarity ?? "–")</dd></div>
+        @if (c.Category is not null) { <div><dt>@T["DetailCategory"]</dt><dd>@c.Category</dd></div> }
+        @if (c.Stage is not null) { <div><dt>@T["DetailStage"]</dt><dd>@c.Stage</dd></div> }
+        @if (c.Hp is { } hp) { <div><dt>@T["DetailHp"]</dt><dd>@hp</dd></div> }
+        @if (c.Types.Length > 0) { <div><dt>@T["DetailTypes"]</dt><dd>@string.Join(", ", c.Types)</dd></div> }
+        @if (c.Retreat is { } retreat) { <div><dt>@T["DetailRetreat"]</dt><dd>@retreat</dd></div> }
+        @if (c.Illustrator is not null) { <div><dt>@T["DetailIllustrator"]</dt><dd>@c.Illustrator</dd></div> }
+        <div><dt>@T["DetailLanguage"]</dt><dd>@(c.Language ?? "EN")</dd></div>
+        <div><dt>@T["DetailAdded"]</dt><dd>@Local(c.AddedAt)</dd></div>
+        <div><dt>@T["DetailCardId"]</dt><dd>@c.CardId</dd></div>
+    </dl>
+
+    @if (!string.IsNullOrWhiteSpace(c.Description))
+    {
+        <p class="detail-desc">@c.Description</p>
+    }
+
+    <div class="detail-buttons">
+        <button type="button" class="btn btn-primary" data-refresh-card="@c.Id">@T["DetailUpdate"]</button>
+        <button type="button" class="btn btn-secondary" data-close-card>@T["DetailClose"]</button>
+    </div>
+</div>

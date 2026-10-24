@@ -40,7 +40,7 @@ public class TcgDexCardDataProvider(HttpClient http) : ICardDataProvider
         var (match, note) = await ChooseMatchAsync(matches, setCode, setTotal, lang);
 
         var card = await GetCardWithFreshestPricingAsync($"{lang}/cards/{Uri.EscapeDataString(match.Id)}");
-        return card is null ? null : ToCardData(card) with { MatchNote = note };
+        return card is null ? null : ToCardData(card) with { MatchNote = note, Language = lang.ToUpperInvariant() };
     }
 
     // TCGdex sits behind several servers that do not always have the same price snapshot: some answers have

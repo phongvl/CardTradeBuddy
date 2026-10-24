@@ -1,5 +1,6 @@
 @page
 @model CardTradeBuddy.Pages.AlbumModel
+@using System.Globalization
 @using CardTradeBuddy.Services
 @{
     Layout = "_LayoutHome";
@@ -25,15 +26,27 @@
         }
         else
         {
-            <p class="album-count">@(Model.TotalCards == 1 ? T["AlbumCountOne"].Value : T["AlbumCountMany", Model.TotalCards].Value)</p>
+            <div class="album-toolbar">
+                <p class="album-count">@(Model.TotalCards == 1 ? T["AlbumCountOne"].Value : T["AlbumCountMany", Model.TotalCards].Value)</p>
+                <button type="button" class="album-update-all" id="update-all" data-total="@Model.TotalCards"
+                        data-progress="@T["AlbumUpdating"]" data-done="@T["AlbumUpdateDone"]" data-summary="@T["AlbumUpdateSummary"]" data-error="@T["DetailFailed"]">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                    <span>@T["AlbumUpdateAll"]</span>
+                </button>
+            </div>
+            <div id="update-status" class="album-update-status" role="status" hidden>
+                <span id="update-text"></span>
+                <span class="update-bar" aria-hidden="true"><span id="update-fill"></span></span>
+            </div>
 
             <partial name="_FinishSprite" />
 
-            @* The cards are not links yet: showing a card's details comes later. The small icon in the corner is the version of the card. *@
+            @* Each card is a button: a click opens its popup with everything saved about it. The small icon in the corner is the version of the card. *@
             <ul class="album-grid">
                 @foreach (var card in Model.Cards)
                 {
                     <li class="album-card">
+                      <button type="button" class="album-card-button" data-card="@card.Id" aria-label="@card.Name" aria-haspopup="dialog">
                         <span class="album-pic">
                             @if (AlbumModel.ThumbnailUrl(card.ImageUrl) is { } thumb)
                             {
@@ -52,6 +65,15 @@
                             }
                         </span>
                         <span class="album-name">@card.Name</span>
+                        @if (card.EstimatedPriceEur is { } price)
+                        {
+                            <span class="album-price" title="@T["AlbumPriceChecked", card.PricesCheckedAt.ToLocalTime().ToString("d", CultureInfo.CurrentCulture)]">@Model.Money(price)</span>
+                        }
+                        else
+                        {
+                            <span class="album-price none" aria-label="@T["AlbumNoPrice"]" title="@T["AlbumNoPrice"]">&ndash;</span>
+                        }
+                      </button>
                     </li>
                 }
             </ul>
@@ -94,8 +116,28 @@
                     }
                 </nav>
             }
+
+            @* The value of the whole album (all pages), at the bottom right. *@
+            <div class="album-total">
+                <span class="album-total-label">@T["AlbumTotal"]</span>
+                <strong class="album-total-amount">@Model.Money(Model.TotalValueEur)</strong>
+                @if (Model.CardsWithoutPrice > 0)
+                {
+                    <span class="album-total-note">@(Model.CardsWithoutPrice == 1 ? T["AlbumTotalMissingOne"].Value : T["AlbumTotalMissingMany", Model.CardsWithoutPrice].Value)</span>
+                }
+            </div>
         }
     </section>
+
+    @* The card popup: filled with /Album?handler=Card when a thumbnail is clicked. The hidden form only carries the anti-forgery token for the update buttons. *@
+    <dialog id="card-dialog" class="card-dialog" aria-labelledby="card-dialog-title">
+        <button type="button" class="card-dialog-close" data-close-card aria-label="@T["DetailClose"]" title="@T["DetailClose"]">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6 L18 18 M18 6 L6 18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" /></svg>
+        </button>
+        <div id="card-dialog-body" class="card-dialog-body"></div>
+    </dialog>
+    <form method="post" id="album-form" class="visually-hidden" data-card-url="@Url.Page("/Album", "Card")" data-refresh-card-url="@Url.Page("/Album", "RefreshCard")" data-refresh-all-url="@Url.Page("/Album", "RefreshAll")" data-album="@Model.AlbumId"
+          data-loading="@T["DetailLoading"]" data-updating="@T["DetailUpdating"]" data-failed="@T["DetailFailed"]"></form>
 </main>
 
 <script src="~/js/album.js" asp-append-version="true" defer></script>

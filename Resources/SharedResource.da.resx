@@ -145,7 +145,7 @@
   <data name="ConsentTitle" xml:space="preserve"><value>Cookies</value></data>
   <data name="ConsentText" xml:space="preserve"><value>CardTradeBuddy bruger kun de cookies, den skal bruge for at virke: så du forbliver logget ind, formularerne er beskyttet, og dit sprog huskes. Der er ingen reklame- eller sporingscookies. For at bruge siden skal du acceptere dem.</value></data>
   <data name="ConsentDetails" xml:space="preserve"><value>Hvilke cookies?</value></data>
-  <data name="ConsentCookieSession" xml:space="preserve"><value>Holder dig logget ind. Den forsvinder, når du lukker browseren, eller efter 30 dage, hvis du skæver Husk mig.</value></data>
+  <data name="ConsentCookieSession" xml:space="preserve"><value>Holder dig logget ind. Den forsvinder, når du lukker browseren, eller efter 30 dage, hvis du sætter hak i Husk mig.</value></data>
   <data name="ConsentCookieAntiforgery" xml:space="preserve"><value>Beskytter formularerne mod misbrug.</value></data>
   <data name="ConsentCookieLanguage" xml:space="preserve"><value>Husker dit sprog i et år.</value></data>
   <data name="ConsentCookieEmail" xml:space="preserve"><value>Husker din e-mailadresse i loginformularen i 30 dage, kun hvis du sætter hak i Husk mig.</value></data>
@@ -169,5 +169,50 @@
   <data name="DisclaimerScrollHint" xml:space="preserve"><value>Rul til bunden af teksten for at fortsætte.</value></data>
   <data name="DisclaimerAccept" xml:space="preserve"><value>Jeg har læst og accepterer</value></data>
   <data name="DisclaimerRequired" xml:space="preserve"><value>Du skal læse og acceptere informationen for at oprette en bruger.</value></data>
+  <data name="AlbumPriceChecked" xml:space="preserve"><value>Pris tjekket {0}</value></data>
+  <data name="AlbumNoPrice" xml:space="preserve"><value>Ingen pris</value></data>
+  <data name="AlbumTotal" xml:space="preserve"><value>Samlet værdi</value></data>
+  <data name="AlbumTotalMissingOne" xml:space="preserve"><value>1 kort uden pris er ikke med.</value></data>
+  <data name="AlbumTotalMissingMany" xml:space="preserve"><value>{0} kort uden pris er ikke med.</value></data>
+  <data name="DetailCategory" xml:space="preserve"><value>Kategori</value></data>
+  <data name="DetailStage" xml:space="preserve"><value>Trin</value></data>
+  <data name="DetailHp" xml:space="preserve"><value>HP</value></data>
+  <data name="DetailTypes" xml:space="preserve"><value>Type</value></data>
+  <data name="DetailRetreat" xml:space="preserve"><value>Retrættepris</value></data>
+  <data name="DetailIllustrator" xml:space="preserve"><value>Illustratør</value></data>
+  <data name="DetailLanguage" xml:space="preserve"><value>Sprog</value></data>
+  <data name="DetailAdded" xml:space="preserve"><value>Tilføjet til albummet</value></data>
+  <data name="DetailCardId" xml:space="preserve"><value>Kort-id</value></data>
+  <data name="DetailPriceChecked" xml:space="preserve"><value>Pris tjekket {0}</value></data>
+  <data name="DetailUpdate" xml:space="preserve"><value>Opdatér kortets oplysninger og pris</value></data>
+  <data name="DetailUpdating" xml:space="preserve"><value>Opdaterer...</value></data>
+  <data name="DetailLoading" xml:space="preserve"><value>Henter...</value></data>
+  <data name="DetailClose" xml:space="preserve"><value>Luk</value></data>
+  <data name="DetailUpdated" xml:space="preserve"><value>Opdateret med de nyeste oplysninger og pris.</value></data>
+  <data name="DetailNotFound" xml:space="preserve"><value>Kortlisten har ikke længere dette kort, så intet er ændret.</value></data>
+  <data name="DetailFailed" xml:space="preserve"><value>Vi kunne ikke nå kortlisten eller valutakursen. Intet er ændret. Prøv igen om lidt.</value></data>
+  <data name="AlbumUpdateAll" xml:space="preserve"><value>Opdatér alle</value></data>
+  <data name="AlbumUpdating" xml:space="preserve"><value>Opdaterer {0} af {1}...</value></data>
+  <data name="AlbumUpdateDone" xml:space="preserve"><value>Færdig. {0} kort gennemgået.</value></data>
+  <data name="AlbumUpdateSummary" xml:space="preserve"><value>{0} opdateret, {1} ikke fundet, {2} fejlede.</value></data>
+  <data name="FooterPrivacy" xml:space="preserve"><value>Privatliv</value></data>
+  <data name="FooterCookies" xml:space="preserve"><value>Cookies</value></data>
+  <data name="PrivacyTitle" xml:space="preserve"><value>Privatlivspolitik</value></data>
+  <data name="CookiesTitle" xml:space="preserve"><value>Cookiepolitik</value></data>
+  <data name="DocUpdated" xml:space="preserve"><value>Senest opdateret {0}</value></data>
+  <data name="DocBack" xml:space="preserve"><value>Tilbage til siden</value></data>
+  <data name="ConsentReadMore" xml:space="preserve"><value>Læs mere:</value></data>
+  <data name="CookiesIntro" xml:space="preserve"><value>Cookies er små tekstfiler, som en hjemmeside gemmer i din browser. CardTradeBuddy bruger kun de cookies, den skal bruge for at virke. Vi bruger ikke reklame-, sporings- eller analysecookies, og vi deler ikke cookiedata med annonører.</value></data>
+  <data name="CookiesTableHeading" xml:space="preserve"><value>De cookies vi bruger</value></data>
+  <data name="CookiesColName" xml:space="preserve"><value>Cookie</value></data>
+  <data name="CookiesColPurpose" xml:space="preserve"><value>Hvad den bruges til</value></data>
+  <data name="CookiesAllNecessary" xml:space="preserve"><value>Alle disse cookies er strengt nødvendige for, at siden virker, og derfor kan du ikke sige nej til dem. Du bliver bedt om at acceptere dem én gang, og din accept huskes i cookien cardtradebuddy.consent.</value></data>
+  <data name="CookiesOthersTitle" xml:space="preserve"><value>Forespørgsler til andre virksomheder</value></data>
+  <data name="CookiesOthersText" xml:space="preserve"><value>Tjekket af, at du er et menneske, i formularerne kommer fra Cloudflare (Turnstile), som kan sætte en sikkerhedscookie, mens det kører. Kortbilleder og sætlogoer hentes direkte fra kortlistens servere (tcgdex.net): din browser kontakter dem, så de modtager din IP-adresse og browseroplysninger, som på enhver anden side, du besøger. Vi styrer ikke de cookies, disse virksomheder kan sætte.</value></data>
+  <data name="CookiesManageTitle" xml:space="preserve"><value>Administrér og slet cookies</value></data>
+  <data name="CookiesManageText" xml:space="preserve"><value>Du kan til enhver tid slette cookies i din browsers indstillinger. Gør du det, bliver du logget ud og bedt om at acceptere cookies igen. Blokerer du dem, kan siden ikke virke.</value></data>
+  <data name="CookiesChangesTitle" xml:space="preserve"><value>Ændringer</value></data>
+  <data name="CookiesChangesText" xml:space="preserve"><value>Hvis vi nogensinde tilføjer cookies, der ikke er strengt nødvendige, spørger vi om dit valg, før de sættes, og opdaterer denne side.</value></data>
+  <data name="CookiesSeePrivacy" xml:space="preserve"><value>Se, hvordan vi behandler personoplysninger, i</value></data>
 </root>
 

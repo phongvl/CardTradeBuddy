@@ -1,0 +1,9 @@
+@model string
+@* The header of the policy pages: language flags on the left (like the front page), the title, and a way back. *@
+<header class="check-header">
+    <partial name="_LanguageSwitch" />
+    <h1 class="check-title">@Model</h1>
+    <a class="check-back" href="/" aria-label="@T["DocBack"]" title="@T["DocBack"]">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 L7.5 12 L14.5 19" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    </a>
+</header>

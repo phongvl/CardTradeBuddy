@@ -1,0 +1,65 @@
+@model CardTradeBuddy.Pages.PrivacyModel
+@* Privatlivspolitikken på dansk. Hold den i takt med _PrivacyEn.cshtml og med det, siden faktisk gør. *@
+
+<p>Denne politik forklarer, hvilke personoplysninger CardTradeBuddy behandler, hvorfor, hvor længe, hvem der modtager dem, og hvilke rettigheder du har. CardTradeBuddy hjælper
+samlere med at genkende samlekort og anslå deres værdi.</p>
+
+<h2>1. Hvem er ansvarlig</h2>
+@if (!string.IsNullOrWhiteSpace(Model.OperatorName) || !string.IsNullOrWhiteSpace(Model.ContactEmail))
+{
+    <p>
+        @if (!string.IsNullOrWhiteSpace(Model.OperatorName)) { <text>CardTradeBuddy drives af <strong>@Model.OperatorName</strong>, som er dataansvarlig for dine personoplysninger.</text> }
+        @if (!string.IsNullOrWhiteSpace(Model.ContactEmail)) { <text> Spørgsmål og anmodninger om dine data: <a href="mailto:@Model.ContactEmail">@Model.ContactEmail</a>.</text> }
+    </p>
+}
+else
+{
+    <p>CardTradeBuddy drives af sin ejer, som er dataansvarlig for dine personoplysninger.</p>
+}
+
+<h2>2. Hvilke data vi behandler, og hvorfor</h2>
+<ul>
+    <li><strong>Din konto.</strong> Din e-mailadresse og adgangskode bruges til at oprette din bruger og logge dig ind. Adgangskoden kontrolleres af vores separate loginløsning
+        (secure.phong.dk), som kun gemmer en uigenkendelig form af den (en hash) og aldrig selve adgangskoden. Grundlag: opfyldelse af aftalen om at give dig en bruger.</li>
+    <li><strong>Din fødselsdag.</strong> Du angiver den, når du opretter en bruger, så vi kan kontrollere, at du er gammel nok (mindst @Model.MinimumAge år). Den gemmes sammen med din bruger og
+        vises aldrig til andre. Grundlag: vores retlige og sikkerhedsmæssige interesse i ikke at tilbyde tjenesten til børn under denne alder.</li>
+    <li><strong>Din accept af meddelelsen om priser og oplysninger.</strong> Vi gemmer, hvornår du accepterede den, og hvilken version af teksten, som dokumentation for, at du gjorde det.</li>
+    <li><strong>Dine indstillinger.</strong> Dit foretrukne sprog gemmes, så siden ser ens ud, næste gang du logger ind.</li>
+    <li><strong>Dine album og kort.</strong> De kort, du tilføjer, hvilken udgave du har angivet, deres priser og hvornår priserne blev tjekket.</li>
+    <li><strong>Billeder af kort.</strong> Et billede, du tager eller uploader, læses i hukommelsen af en billedlæsende model på vores egen server for at finde ud af, hvilket kort det er. Billedet
+        <strong>gemmes ikke</strong>, skrives ikke i en log og sendes ikke til nogen ekstern AI-tjeneste. Kun kortets navn og nummer sendes videre til kortlisten (se afsnit 4).</li>
+    <li><strong>Tekniske data og sikkerhed.</strong> Din IP-adresse bruges, mens du bruger siden, til at begrænse misbrug (for eksempel for mange loginforsøg). Vores server gemmer også en log over
+        loginforsøg (e-mailadresse, tidspunkt og om det lykkedes) og fejl. Grundlag: vores legitime interesse i at holde tjenesten sikker.</li>
+    <li><strong>E-mails.</strong> Vi sender en e-mail, når du nulstiller din adgangskode eller, hvis det er slået til, for at bekræfte din e-mailadresse. Der sendes kun disse servicemails, aldrig reklame.</li>
+</ul>
+
+<h2>3. Cookies</h2>
+<p>Vi bruger kun de cookies, siden skal bruge for at virke. Vi bruger ikke reklame-, sporings- eller analysecookies. Se <a asp-page="/Cookies">cookiepolitikken</a> for listen.</p>
+
+<h2>4. Hvem vi deler data med</h2>
+<p>Vi sælger ikke dine data og bruger dem ikke til reklame. Nogle virksomheder behandler data for os eller modtager forespørgsler, når du bruger siden:</p>
+<ul>
+    <li><strong>Resend</strong> (udsendelse af e-mail): din e-mailadresse og indholdet af servicemailen.</li>
+    <li><strong>Cloudflare</strong> (tjekket af, at du er et menneske, i formularerne, Turnstile): tekniske data som din IP-adresse og browseroplysninger, for at skelne mennesker fra automatiske programmer.</li>
+    <li><strong>TCGdex</strong> (kortlisten, tcgdex.net): vi sender kortets navn og nummer for at slå det op. Kortbilleder hentes direkte fra deres servere, så de ser din IP-adresse, som på enhver anden side, du besøger.</li>
+    <li><strong>Frankfurter</strong> (valutakurser): der sendes ingen personoplysninger.</li>
+</ul>
+<p>Nogle af disse virksomheder er uden for EU/EØS. Hvor det er tilfældet, sker overførslen på det grundlag, loven kræver, for eksempel en tilstrækkelighedsafgørelse eller standardkontraktbestemmelser.</p>
+
+<h2>5. Hvor længe vi gemmer data</h2>
+<p>Dine kontooplysninger, album og kort gemmes, så længe du har en bruger. Billeder gemmes aldrig. Logposter gemmes kun så længe, det er nødvendigt for at holde tjenesten sikker og kørende, og
+overskrives eller slettes derefter. Der er endnu ikke en knap til at slette din bruger: for at få din bruger og alt, der er gemt med den, slettet, kan du kontakte os (se afsnit 1).</p>
+
+<h2>6. Dine rettigheder</h2>
+<p>Du har ret til at bede om indsigt i de data, vi har om dig, til at få dem rettet eller slettet, til at begrænse eller gøre indsigelse mod brugen af dem og til at få dem udleveret i et overførbart format.
+Kontakt os for at bruge disse rettigheder. Du kan også klage til Datatilsynet (<a href="https://www.datatilsynet.dk" rel="noopener">datatilsynet.dk</a>).</p>
+
+<h2>7. Børn</h2>
+<p>CardTradeBuddy er for personer på mindst @Model.MinimumAge år. Hvis vi får at vide, at en bruger er yngre, sletter vi brugeren.</p>
+
+<h2>8. Sikkerhed</h2>
+<p>Siden leveres over en krypteret forbindelse (HTTPS), adgangskoder gemmes aldrig i læsbar form, formularer er beskyttet mod misbrug, og adgangen til dine album er begrænset til dig.
+Intet system er helt sikkert, så vi kan ikke love absolut sikkerhed.</p>
+
+<h2>9. Ændringer</h2>
+<p>Hvis vi ændrer, hvad vi gør med data, opdaterer vi denne side og dens dato. Ved større ændringer giver vi dig besked i tjenesten.</p>

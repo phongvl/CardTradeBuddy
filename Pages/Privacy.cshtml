@@ -1,0 +1,24 @@
+@page
+@model CardTradeBuddy.Pages.PrivacyModel
+@{
+    Layout = "_LayoutHome";
+    ViewData["Title"] = T["PrivacyTitle"].Value;
+    ViewData["NoConsentGate"] = true;   // this page has to be readable before the cookies are accepted
+}
+
+<main class="doc-page">
+    <partial name="_DocHeader" model="@T["PrivacyTitle"].Value" />
+
+    <article class="doc-card">
+        <p class="doc-updated">@T["DocUpdated", PrivacyModel.Updated]</p>
+
+        @if (System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "da")
+        {
+            <partial name="_PrivacyDa" model="Model" />
+        }
+        else
+        {
+            <partial name="_PrivacyEn" model="Model" />
+        }
+    </article>
+</main>

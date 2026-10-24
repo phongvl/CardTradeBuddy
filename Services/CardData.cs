@@ -5,6 +5,10 @@ public record CardData
     public required string Id { get; init; }
     public required string LocalId { get; init; }
     public required string Name { get; init; }
+
+    /// <summary>The language the card was looked up in, upper case as printed on cards ("EN", "DE", "JA", ...). Needed to find it again later.</summary>
+    public string Language { get; init; } = "EN";
+
     public string? Category { get; init; }
     public string? Rarity { get; init; }
     public string? Illustrator { get; init; }

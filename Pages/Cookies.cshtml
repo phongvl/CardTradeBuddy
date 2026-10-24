@@ -1,0 +1,43 @@
+@page
+@model CardTradeBuddy.Pages.CookiesModel
+@using CardTradeBuddy.Services
+@{
+    Layout = "_LayoutHome";
+    ViewData["Title"] = T["CookiesTitle"].Value;
+    ViewData["NoConsentGate"] = true;   // this page has to be readable before the cookies are accepted
+}
+
+<main class="doc-page">
+    <partial name="_DocHeader" model="@T["CookiesTitle"].Value" />
+
+    <article class="doc-card">
+        <p class="doc-updated">@T["DocUpdated", CookiesModel.Updated]</p>
+
+        <p>@T["CookiesIntro"]</p>
+
+        <h2>@T["CookiesTableHeading"]</h2>
+        <div class="doc-table-wrap">
+            <table class="doc-table">
+                <thead><tr><th scope="col">@T["CookiesColName"]</th><th scope="col">@T["CookiesColPurpose"]</th></tr></thead>
+                <tbody>
+                    @foreach (var cookie in CookieList.All)
+                    {
+                        <tr><th scope="row"><code>@cookie.Name</code></th><td>@T[cookie.DescriptionKey]</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <p>@T["CookiesAllNecessary"]</p>
+
+        <h2>@T["CookiesOthersTitle"]</h2>
+        <p>@T["CookiesOthersText"]</p>
+
+        <h2>@T["CookiesManageTitle"]</h2>
+        <p>@T["CookiesManageText"]</p>
+
+        <h2>@T["CookiesChangesTitle"]</h2>
+        <p>@T["CookiesChangesText"]</p>
+
+        <p>@T["CookiesSeePrivacy"] <a asp-page="/Privacy">@T["PrivacyTitle"]</a>.</p>
+    </article>
+</main>
